@@ -108,11 +108,15 @@ Descomprima el directorio y úselo.
 1. Los documentos docx ó markdown que se quieran convertir - transformar se deben colocar en la carpeta Temporales al interior del directorio del programa (En caso de borrarse dicha carpeta se puede crear o dejar que el sistema la cree).
 
 Carpeta de Moodocx
+
 |___Moodocx.exe
+
 |___Temporales
 
 Carpeta de moodocx
+
 |___moodocx.py
+
 |___Temporales
 
 2. Seleccionar las opciones (Se recomienda no enviar directamente con la opción moodle para verificar previamente el docx que se procesará).
