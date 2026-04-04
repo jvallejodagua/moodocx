@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# __PDWM__DocxToMd_V0_0_5
+# __PDWM__DocxToMdConverter_V0_0_5
 
 """
 Script para convertir archivos .docx a Markdown (.md) utilizando Pandoc.
@@ -21,7 +21,7 @@ from filesystem.files_finder import FilesInSubfolder
 import time
 
 # Clase principal
-class DocxToMd:
+class DocxToMdConverter:
     """
     Una clase para convertir todos los archivos .docx de un directorio a Markdown.
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     SOURCE_FOLDER = "Temporales"
     
     try:
-        converter = DocxToMd(SOURCE_FOLDER)
+        converter = DocxToMdConverter(SOURCE_FOLDER)
         converter.run()
         
     except FileNotFoundError as e:

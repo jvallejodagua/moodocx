@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pydantic_to_moodle_xml.py
+# pydantic_to_moodle_xml_converter.py
 
 """
 Módulo para convertir los modelos Pydantic de cuestionarios, generados por
@@ -17,7 +17,7 @@ from xml.dom import minidom
 # --- Dependencias del proyecto ---
 from json_encoder.docx_to_pydantic import DocxToPydantic, DocumentModel, QuestionModel
 
-class PydanticToMoodleXml:
+class PydanticToMoodleXmlConverter:
     """
     Convierte una lista de modelos Pydantic (DocumentModel) a archivos XML
     en formato Moodle Quiz.
@@ -177,5 +177,5 @@ if __name__ == "__main__":
     INPUT_FOLDER = "Temporales"
     OUTPUT_FOLDER = "Temporales" # Carpeta de salida para los XML
 
-    converter = PydanticToMoodleXml(input_dir=INPUT_FOLDER, output_dir=OUTPUT_FOLDER)
+    converter = PydanticToMoodleXmlConverter(input_dir=INPUT_FOLDER, output_dir=OUTPUT_FOLDER)
     converter.run()

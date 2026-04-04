@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# latex_formulas_to_png.py
+# latex_formulas_to_png_converter.py
 
 import os
 import re
@@ -13,7 +13,7 @@ import time
 from filesystem.files_finder import FilesInSubfolder
 from filesystem.path_latex_windows import resolve_pdflatex_path
 
-class LaTeXFormulasToPng:
+class LaTeXFormulasToPngConverter:
     """
     Clase para procesar archivos Markdown, detectando fórmulas LaTeX (inline y bloque)
     y convirtiéndolas en imágenes PNG mediante el compilador nativo de LaTeX (latexmk)
@@ -190,5 +190,5 @@ class LaTeXFormulasToPng:
 
 # --- Bloque de Ejecución Principal ---
 if __name__ == "__main__":
-    procesador = LaTeXFormulasToPng(target_directory="Temporales")
+    procesador = LaTeXFormulasToPngConverter(target_directory="Temporales")
     procesador.run()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# latex_tables_to_png.py
+# latex_tables_to_png_converter.py
 
 import os
 import re
@@ -223,7 +223,7 @@ class Compilador_Tablas:
 
         return reemplazo
 
-class LaTeXTablesToPng:
+class LaTeXTablesToPngConverter:
 
     def __init__(self,  eliminar_texto_ayuda, target_dir):
         self.eliminar_texto_ayuda=eliminar_texto_ayuda
@@ -268,5 +268,5 @@ class LaTeXTablesToPng:
 
 if __name__ == "__main__":
     eliminar_texto_ayuda=True
-    processor = LaTeXTablesToPng(eliminar_texto_ayuda)
+    processor = LaTeXTablesToPngConverter(eliminar_texto_ayuda)
     processor.run()

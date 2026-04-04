@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# md_formatter_iterator.py
+# md_formatter_processor.py
 
 import re
 from md_encoder.md_formatter import MdFormatter
 from filesystem.files_finder import FilesInSubfolder
 import time
 
-class MdFormatterIterator:
+class MdFormatterProcessor:
     
     def __init__(self, source_directory: str):
         self.markdown_formater = None

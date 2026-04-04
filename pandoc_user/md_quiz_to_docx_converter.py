@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# md_quiz_to_docx.py
+# md_quiz_to_docx_converter.py
 
 """
 Script para reestructurar archivos Markdown de cuestionarios.
@@ -283,7 +283,7 @@ class DocxPostProcessor:
             doc.save(file_path)
 
 
-class MdQuizToDocx:
+class MdQuizToDocxConverter:
     """
     Clase que encapsula la lógica para reestructurar archivos Markdown
     de cuestionarios.
@@ -463,7 +463,7 @@ if __name__ == '__main__':
     
     try:
         
-        restructurer = MdQuizToDocx(source_folder=FOLDER,destination_folder=FOLDER)
+        restructurer = MdQuizToDocxConverter(source_folder=FOLDER,destination_folder=FOLDER)
         restructurer.run()
         
     except ImportError:
