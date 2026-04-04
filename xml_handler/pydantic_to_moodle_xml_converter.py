@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
 # --- Dependencias del proyecto ---
-from json_encoder.docx_to_pydantic import DocxToPydantic, DocumentModel, QuestionModel
+from json_handler.docx_to_pydantic import DocxToPydantic, DocumentModel, QuestionModel
 
 class PydanticToMoodleXmlConverter:
     """

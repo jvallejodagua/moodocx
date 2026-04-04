@@ -30,7 +30,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 
 from filesystem.files_finder import FilesInSubfolder
-from html_css_encoder.image_word_to_image_tag import generate_html_image_output
+from html_css_handler.image_word_to_image_tag import generate_html_image_output
 
 # --- Modelos Pydantic para la Estructura de Datos ---
 # (Sin cambios en los modelos)

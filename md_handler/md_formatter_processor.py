@@ -2,7 +2,7 @@
 # md_formatter_processor.py
 
 import re
-from md_encoder.md_formatter import MdFormatter
+from md_handler.md_formatter import MdFormatter
 from filesystem.files_finder import FilesInSubfolder
 import time
 
