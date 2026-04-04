@@ -44,27 +44,13 @@ Existen algunos prerrequisitos clave para la instalación ó ejecución exitosa 
 
 ### Instalación y Ejecución
 
-#### pdftocairo 
-
-##### Windows
-
-Descargue pdftocairo del enlace (se encuentra como un .exe dentro del comprimido):
-
-![https://github.com/oschwartz10612/poppler-windows/releases](https://github.com/oschwartz10612/poppler-windows/releases)
-
-Luego se ubica apropiadamente en una carpeta que difícilmente se elimine por error y se configura su acceso con el nombre pdftocairo en las variables de entorno.
-
-##### Linux
-
-Suele estar en el repositorio del sistema.
-
 #### pandoc
 
 ##### Windows
 
 Descargue pandoc del enlace (Archivo .msi):
 
-![https://github.com/jgm/pandoc/releases](https://github.com/jgm/pandoc/releases)
+[https://github.com/jgm/pandoc/releases](https://github.com/jgm/pandoc/releases)
 
 ##### Linux
 
@@ -76,11 +62,11 @@ Suele estar en el repositorio del sistema.
 
 Descargue e instale strawberry perl:
 
-![https://strawberryperl.com/](https://strawberryperl.com/)
+[https://strawberryperl.com](https://strawberryperl.com)
 
 Descargue e instale la distribución de MikTeX (pestaña installer):
 
-![https://miktex.org/download](https://miktex.org/download)
+[https://miktex.org/download](https://miktex.org/download)
 
 Nota: No emplee versión portable.
 
@@ -90,13 +76,13 @@ Instale perl desde el repositorio del sistema
 
 Descargue e instale siguiendo las instrucciones de la sección "tl;dr: Unix(ish)":
 
-![https://www.tug.org/texlive/quickinstall.html](https://www.tug.org/texlive/quickinstall.html)
+[https://www.tug.org/texlive/quickinstall.html](https://www.tug.org/texlive/quickinstall.html)
 
 
 ### Ejecución del código fuente
 
 1. Instale un entorno virtual python.
-2. Instale las dependencias usando el comando: ruta_a_entornovirtual/pip install asyncio wheel python-docx panflute flet[all] bs4
+2. Instale las dependencias usando el comando: ruta_a_entornovirtual/pip install asyncio wheel python-docx panflute flet[all] bs4 PIL pypdfium2
 3. Ejecute el programa: ruta_a_entornovirtual/python3 moodocx.py
 
 ### Ejecutable (No disponible aún)

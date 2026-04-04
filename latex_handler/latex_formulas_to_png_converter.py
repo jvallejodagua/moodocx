@@ -10,6 +10,8 @@ import hashlib
 import platform
 from pathlib import Path
 import time
+from pypdfium2 import PdfDocument, PdfPage
+import PIL
 from filesystem.files_finder import FilesInSubfolder
 from filesystem.path_latex_windows import resolve_pdflatex_path
 
@@ -17,7 +19,7 @@ class LaTeXFormulasToPngConverter:
     """
     Clase para procesar archivos Markdown, detectando fórmulas LaTeX (inline y bloque)
     y convirtiéndolas en imágenes PNG mediante el compilador nativo de LaTeX (latexmk)
-    y pdftocairo, reemplazando el texto original por referencias a las imágenes.
+    y pypdfium2, reemplazando el texto original por referencias a las imágenes.
     """
 
     def __init__(self, target_directory: str, image_subfolder: str = "Imagenes"):
@@ -65,7 +67,7 @@ class LaTeXFormulasToPngConverter:
     def _compile_to_png(self, latex_document: str, output_image_path: Path):
         """
         Escribe el código en un archivo temporal, lo compila con latexmk 
-        y lo convierte a PNG usando pdftocairo.
+        y lo convierte a PNG usando pypdfium2.
         """
         temp_dir = self.target_dir / "compilados"
         temp_dir.mkdir(exist_ok=True)
@@ -96,22 +98,44 @@ class LaTeXFormulasToPngConverter:
             return False
         time.sleep(2)
         #print(pdf_file.exists)
-        # 3. Convertir PDF a PNG con pdftocairo
+        # 3. Convertir PDF a PNG con pypdfium2
         if pdf_file.exists():
-            subprocess.run(
-                ['pdftocairo', '-png', '-singlefile', '-r', '300', f'{base_name}.pdf', base_name],
-                cwd=str(temp_dir),
-                check=False
-            )
             
+            pdf_converter = PdfDocument(pdf_file)
+            page_counter = len(pdf_converter)
+            pdf_dpi = 72
+            objective_dpi = 300
+            resolution_scale_factor = objective_dpi/pdf_dpi
+
             generated_png = temp_dir / f"{base_name}.png"
-            
+
+            for page_index in range(page_counter):
+                page_instance = pdf_converter.get_page(page_index)
+                
+                bitmap_rasterized = page_instance.render(
+                    scale=resolution_scale_factor,
+                    rotation=0,
+                    crop=(0, 0, 0, 0),
+                    fill_color=[255, 255, 255, 255],
+                    draw_annots=True,
+                    grayscale=False,
+                    optimize_mode=None,
+                )
+                
+                pil_bitmap = bitmap_rasterized.to_pil()
+
+                pil_bitmap.save(
+                    generated_png,
+                    format="PNG",
+                    dpi=(objective_dpi,objective_dpi),
+                )
+
             # 4. Mover la imagen generada a la ruta final
             if generated_png.exists():
                 shutil.copy(generated_png, output_image_path)
                 return True
             else:
-                print("  [!] Error: pdftocairo no generó la imagen PNG.")
+                print("  [!] Error: pypdfium2 no generó la imagen PNG.")
                 return False
         else:
             print("  [!] Error: No se generó el archivo PDF.")

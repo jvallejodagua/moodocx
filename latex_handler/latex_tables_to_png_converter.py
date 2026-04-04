@@ -10,6 +10,8 @@ from pathlib import Path
 import time
 import platform
 import hashlib
+from pypdfium2 import PdfDocument, PdfPage
+import PIL
 from filesystem.files_finder import FilesInSubfolder
 from filesystem.path_latex_windows import resolve_pdflatex_path
 
@@ -194,14 +196,35 @@ class Compilador_Tablas:
         
         if pdf_file.exists():
             print(f"  Convirtiendo PDF a PNG...")
-            # pdftocairo genera temp-1.png cuando le pasas "temp" como prefijo
-            subprocess.run(
-                ['pdftocairo', '-png', '-singlefile', '-r', '300', 'temp.pdf', 'temp'],
-                cwd=temp_path,
-                check=False
-            )
-            
-            generated_png = temp_path / "temp.png"
+            pdf_converter = PdfDocument(pdf_file)
+            page_counter = len(pdf_converter)
+            pdf_dpi = 72
+            objective_dpi = 300
+            resolution_scale_factor = objective_dpi/pdf_dpi
+            base_name = "temp"
+
+            generated_png = temp_path / f"{base_name}.png"
+
+            for page_index in range(page_counter):
+                page_instance = pdf_converter.get_page(page_index)
+                
+                bitmap_rasterized = page_instance.render(
+                    scale=resolution_scale_factor,
+                    rotation=0,
+                    crop=(0, 0, 0, 0),
+                    fill_color=[255, 255, 255, 255],
+                    draw_annots=True,
+                    grayscale=False,
+                    optimize_mode=None,
+                )
+                
+                pil_bitmap = bitmap_rasterized.to_pil()
+
+                pil_bitmap.save(
+                    generated_png,
+                    format="PNG",
+                    dpi=(objective_dpi,objective_dpi),
+                )
             
             # 4. Mover imagen a la carpeta destino
             if generated_png.exists():
