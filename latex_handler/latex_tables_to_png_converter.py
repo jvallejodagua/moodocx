@@ -12,13 +12,14 @@ import platform
 import hashlib
 from pypdfium2 import PdfDocument, PdfPage
 import PIL
-from filesystem.files_finder import FilesInSubfolder
+from filesystem.files_finder import FilesInSubfolder, FilesChecker
 from filesystem.path_latex_windows import resolve_pdflatex_path
 
 class Compilador_Tablas:
         # 1. Al instanciar la clase, le pasas tus argumentos extra
     def __init__(self, nombre_archivo_md, base_dir, eliminar_texto_ayuda):
 
+        self.files_finder = FilesChecker()
         self.nombre_archivo = nombre_archivo_md.replace(" ", "")
         self.base_dir=base_dir
         self.contador_tablas = 1  # Llevamos la cuenta de cuántas tablas van
@@ -159,7 +160,6 @@ class Compilador_Tablas:
         with open(tex_file, 'w', encoding='utf-8') as f:
             f.write(latex_code)
         
-        time.sleep(3)
         # 2. Compilar con pdflatex
         print(f"  Compilando tabla {self.contador_tablas}...")
         try:
@@ -189,12 +189,10 @@ class Compilador_Tablas:
             reemplazo = tabla_markdown
             return reemplazo
         
-        time.sleep(3)
-        
         # 3. Convertir a PNG
         pdf_file = temp_path / "temp.pdf"
         
-        if pdf_file.exists():
+        if self.files_finder.file_exists(pdf_file):
             print(f"  Convirtiendo PDF a PNG...")
             pdf_converter = PdfDocument(pdf_file)
             page_counter = len(pdf_converter)

@@ -34,6 +34,7 @@ from docx.shared import Pt
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_COLOR_INDEX
+from filesystem.files_finder import FilesChecker
 
 import re
 from pathlib import Path
@@ -302,8 +303,9 @@ class MdQuizToDocxConverter:
                                  esté al mismo nivel que el script.
         """
         self.source_path = Path(source_folder)
-        self.destination_path = Path(destination_folder)
+        self.destination_path = Path(destination_folder).absolute()
         self.reuse_stimulus = reuse_stimulus_input
+        self.files_finder = FilesChecker()
 
     def reorder_doc(self, doc: pf.Doc) -> pf.Doc:
         '''
@@ -396,14 +398,18 @@ class MdQuizToDocxConverter:
             if filename.lower().endswith(".md"):
                 markdown_files_found = True
                 full_path = os.path.join(self.source_path, filename)
+                
                 path_to_normal=os.path.join(self.destination_path,filename)
+                docx_path = Path(path_to_normal.replace(".md",".docx"))
+                
                 #path_to_images=os.path.join(self.source_path,"Imagenes")
                 full_path_output = os.path.join(self.destination_path, filename.replace(".md","-modificado.md"))
-                
+                docx_modified_path = Path(full_path_output.replace(".md",".docx"))
+
                 command = [
                     "pandoc",
                     str(full_path),
-                    "-o", str(path_to_normal.replace(".md",".docx")),
+                    "-o", str(docx_path),
                     "--wrap=none",
                     f"--resource-path=.{os.pathsep}{self.source_path}"]
                 
@@ -415,14 +421,15 @@ class MdQuizToDocxConverter:
                     encoding='utf-8'
                     )
                 
+                self.files_finder.file_exists(docx_path)
+                
                 # Instanciamos el procesador (puedes hacerlo fuera del loop si prefieres optimizar)
                 docx_cleaner = DocxPostProcessor()
 
                 # Aplicamos la limpieza al archivo docx recién creado
-                docx_path = str(path_to_normal.replace(".md", ".docx"))
-                docx_cleaner.remove_bullets_keep_indent(docx_path)
+                docx_cleaner.remove_bullets_keep_indent(str(docx_path))
                 #Convertir opciones A. B. C. a lista real
-                docx_cleaner.convert_text_options_to_list(docx_path)
+                docx_cleaner.convert_text_options_to_list(str(docx_path))
 
                 if self.reuse_stimulus:
 
@@ -446,11 +453,12 @@ class MdQuizToDocxConverter:
                         encoding='utf-8'
                         )
                     
+                    self.files_finder.file_exists(docx_modified_path)
+
                     # Aplicamos la limpieza al archivo docx recién creado
-                    docx_path = str(full_path_output.replace(".md", ".docx"))
-                    docx_cleaner.remove_bullets_keep_indent(docx_path)
+                    docx_cleaner.remove_bullets_keep_indent(str(docx_modified_path))
                     #Convertir opciones A. B. C. a lista real
-                    docx_cleaner.convert_text_options_to_list(docx_path)
+                    docx_cleaner.convert_text_options_to_list(str(docx_modified_path))
         
         if not markdown_files_found:
             print("No se encontraron archivos .md en la carpeta.")

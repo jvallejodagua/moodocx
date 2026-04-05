@@ -94,10 +94,10 @@ class DocxToMdConverter:
 
             try:
                 result = self.execute_pandoc_process(command)
-                print(f"  -> ÉXITO: Archivo '{md_file.name}' creado correctamente.")
-                success_count += 1
-
-                time.sleep(1)
+                if self.files_finder.file_exists(md_file):
+                    print(f"  -> ÉXITO: Archivo '{md_file.name}' creado correctamente.")
+                    success_count += 1
+                
 
             except FileNotFoundError:
                 print("\nERROR CRÍTICO: El comando 'pandoc' no se encontró.")

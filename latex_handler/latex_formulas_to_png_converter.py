@@ -80,8 +80,6 @@ class LaTeXFormulasToPngConverter:
         with open(tex_file, 'w', encoding='utf-8') as f:
             f.write(latex_document)
         
-        time.sleep(2)
-        #print(temp_dir)
         # 2. Compilar con latexmk (Genera PDF)
         try:
             #print(self.pdflatex_path, '-pdf', '-interaction=nonstopmode', f'{base_name}.tex')
@@ -96,10 +94,10 @@ class LaTeXFormulasToPngConverter:
         except subprocess.CalledProcessError as e:
             print(f"  [!] Error de compilación LaTeX:\n{e.stderr}")
             return False
-        time.sleep(2)
+        
         #print(pdf_file.exists)
         # 3. Convertir PDF a PNG con pypdfium2
-        if pdf_file.exists():
+        if self.files_finder.file_exists(pdf_file):
             
             pdf_converter = PdfDocument(pdf_file)
             page_counter = len(pdf_converter)
