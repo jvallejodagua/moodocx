@@ -34,7 +34,7 @@ from docx.shared import Pt
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_COLOR_INDEX
-from filesystem.files_finder import FilesChecker
+from filesystem.files_finder import FilesInSubfolder
 
 import re
 from pathlib import Path
@@ -291,8 +291,8 @@ class MdQuizToDocxConverter:
     """
 
     def __init__(self,
-        source_folder: str = "Temporales",
-        destination_folder: str = "TemporalesTextoAVoz",
+        source_folder: Path = Path("Temporales"),
+        destination_folder: Path = Path("TemporalesTextoAVoz"),
         reuse_stimulus_input: bool = False):
         """
         Inicializa el restructurador.
@@ -302,10 +302,10 @@ class MdQuizToDocxConverter:
                                  archivos .md a procesar. Se espera que
                                  esté al mismo nivel que el script.
         """
-        self.source_path = Path(source_folder)
-        self.destination_path = Path(destination_folder).absolute()
+        self.source_path = source_folder
+        self.destination_path = destination_folder
         self.reuse_stimulus = reuse_stimulus_input
-        self.files_finder = FilesChecker()
+        self.files_finder = FilesInSubfolder(self.source_path, ".md")
 
     def reorder_doc(self, doc: pf.Doc) -> pf.Doc:
         '''
@@ -387,78 +387,80 @@ class MdQuizToDocxConverter:
         Ejecuta el proceso de reestructuración para todos los archivos .md
         en la carpeta de origen.
         """
-        if not os.path.isdir(self.source_path):
+        if not self.source_path.is_dir():
             print(f"El directorio de origen '{self.source_path}' no fue encontrado.")
             print("El script no procesará ningún archivo.")
             return
 
         print(f"Iniciando proceso en la carpeta: '{self.source_path}'")
         markdown_files_found = False
-        for filename in os.listdir(self.source_path):
-            if filename.lower().endswith(".md"):
-                markdown_files_found = True
-                full_path = os.path.join(self.source_path, filename)
-                
-                path_to_normal=os.path.join(self.destination_path,filename)
-                docx_path = Path(path_to_normal.replace(".md",".docx"))
-                
-                #path_to_images=os.path.join(self.source_path,"Imagenes")
-                full_path_output = os.path.join(self.destination_path, filename.replace(".md","-modificado.md"))
-                docx_modified_path = Path(full_path_output.replace(".md",".docx"))
+
+        md_files = self.files_finder.get_files()
+
+        for md_file in md_files:
+            md_modified_file = md_file.parent / f'{md_file.stem}-modificado.md'
+            docx_file = md_file.parent / f'{md_file.stem}.docx'
+            docx_modified_file = md_file.parent / f'{md_modified_file.stem}.docx'
+
+            markdown_files_found = True
+            
+            command = [
+                "pandoc",
+                str(md_file),
+                "-o", str(docx_file),
+                "--wrap=none",
+                #f"--resource-path=.{os.pathsep}{self.source_path}"]
+                f"--resource-path={self.source_path}"]
+            
+            subprocess.run(
+                command,
+                cwd=str(self.files_finder.files_path.absolute()),
+                env=os.environ.copy(),
+                check=True,
+                capture_output=True,
+                text=True,
+                encoding='utf-8'
+            )
+            
+            self.files_finder.file_exists(docx_file)
+            
+            # Instanciamos el procesador (puedes hacerlo fuera del loop si prefieres optimizar)
+            docx_cleaner = DocxPostProcessor()
+
+            # Aplicamos la limpieza al archivo docx recién creado
+            docx_cleaner.remove_bullets_keep_indent(str(docx_file))
+            #Convertir opciones A. B. C. a lista real
+            docx_cleaner.convert_text_options_to_list(str(docx_file))
+
+            if self.reuse_stimulus:
+
+                self._process_file(str(md_file),str(md_modified_file))
 
                 command = [
                     "pandoc",
-                    str(full_path),
-                    "-o", str(docx_path),
+                    str(md_modified_file),
+                    "-o",
+                    str(docx_modified_file),
                     "--wrap=none",
-                    f"--resource-path=.{os.pathsep}{self.source_path}"]
-                
+                    #f"--resource-path=:{self.source_path}"]
+                    f"--resource-path={self.source_path}"]
+
                 subprocess.run(
                     command,
-                    check=True,        # Lanza una excepción si el comando devuelve un código de error.
-                    capture_output=False, # Captura la salida estándar y el error estándar.
+                    cwd=str(self.files_finder.files_path.absolute()),
+                    env=os.environ.copy(),
+                    check=True,
+                    capture_output=True,
                     text=True,
                     encoding='utf-8'
-                    )
+                )
                 
-                self.files_finder.file_exists(docx_path)
-                
-                # Instanciamos el procesador (puedes hacerlo fuera del loop si prefieres optimizar)
-                docx_cleaner = DocxPostProcessor()
+                self.files_finder.file_exists(docx_modified_file)
 
                 # Aplicamos la limpieza al archivo docx recién creado
-                docx_cleaner.remove_bullets_keep_indent(str(docx_path))
+                docx_cleaner.remove_bullets_keep_indent(str(docx_modified_file))
                 #Convertir opciones A. B. C. a lista real
-                docx_cleaner.convert_text_options_to_list(str(docx_path))
-
-                if self.reuse_stimulus:
-
-                    self._process_file(full_path,full_path_output)
-                    #print(path_to_images)
-                    #Convertir los archivos en docx
-
-                    command = [
-                        "pandoc",
-                        str(full_path_output),
-                        "-o",
-                        str(full_path_output.replace(".md",".docx")),
-                        "--wrap=none",
-                        f"--resource-path=:{self.source_path}"]
-                    #os.system("pandoc " + full_path_output + " -o " + full_path_output.replace(".md",".docx"))
-                    subprocess.run(
-                        command,
-                        check=True,        # Lanza una excepción si el comando devuelve un código de error.
-                        capture_output=True, # Captura la salida estándar y el error estándar.
-                        text=True, # Decodifica la salida y el error como texto.
-                        encoding='utf-8'
-                        )
-                    
-                    self.files_finder.file_exists(docx_modified_path)
-
-                    # Aplicamos la limpieza al archivo docx recién creado
-                    docx_cleaner.remove_bullets_keep_indent(str(docx_modified_path))
-                    #Convertir opciones A. B. C. a lista real
-                    docx_cleaner.convert_text_options_to_list(str(docx_modified_path))
+                docx_cleaner.convert_text_options_to_list(str(docx_modified_file))
         
         if not markdown_files_found:
             print("No se encontraron archivos .md en la carpeta.")
