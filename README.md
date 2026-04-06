@@ -85,9 +85,9 @@ Descargue e instale siguiendo las instrucciones de la sección "tl;dr: Unix(ish)
 2. Instale las dependencias usando el comando: ruta_a_entornovirtual/pip install asyncio wheel python-docx panflute flet[all] bs4 PIL pypdfium2
 3. Ejecute el programa: ruta_a_entornovirtual/python3 moodocx.py
 
-### Ejecutable (No disponible aún)
+### Ejecutable (Ver la sección de releases)
 
-Descomprima el directorio y úselo.
+Se ubica en un directorio que se desee para trabajar con la aplicación y se hace doble click (los usuarios linux deben asegurar el permiso de ejecución). Es importante no ubicar las versiones originales de los documentos en el directorio "Temporales" de la aplicación porque será modificado allí de forma irreversible. Una vez se esté a gusto con el resultado entonces se puede decidir cuál archivo conservar.
 
 ## Cómo usarlo
 
