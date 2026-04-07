@@ -57,8 +57,13 @@ class LaTeXFormulasToPngConverter:
             r"\usepackage[utf8]{inputenc}",
             r"\usepackage[version=4]{mhchem}",
             r"\usepackage{amsmath}",
-            r"\begin{document}",
-            r"\normalsize",
+            r"\usepackage{amssymb}",
+            r"\usepackage{amsfonts}",
+            r"\usepackage{physics}",
+            r"\usepackage{siunitx}",
+            r"\usepackage{xcolor}",
+            r"\pagecolor{white}",
+            r"\begin{document}",            r"\normalsize",
             f"{delimiter}{latex_code}{delimiter}",
             r"\end{document}"
         ]
