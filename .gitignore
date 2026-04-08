@@ -6,3 +6,6 @@ __pycache__/
 build/
 dist/
 moodocx.spec
+gemma-3n-E2B-it-int4.task
+gemma_2b_it_Q4_K_M.gguf
+docs_gemma

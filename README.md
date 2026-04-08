@@ -82,7 +82,7 @@ Descargue e instale siguiendo las instrucciones de la sección "tl;dr: Unix(ish)
 ### Ejecución del código fuente
 
 1. Instale un entorno virtual python.
-2. Instale las dependencias usando el comando: ruta_a_entornovirtual/pip install asyncio wheel python-docx panflute flet[all] bs4 PIL pypdfium2
+2. Instale las dependencias usando el comando: ruta_a_entornovirtual/pip install asyncio wheel python-docx panflute flet[all] bs4 PIL pypdfium2 mediapipe llama-cpp-python
 3. Ejecute el programa: ruta_a_entornovirtual/python3 moodocx.py
 
 ### Ejecutable (Ver la sección de releases)
