@@ -25,7 +25,9 @@ class MdFormatterProcessor:
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            self.markdown_formater = MdFormatter(content)
+            self.markdown_formater = MdFormatter(
+                content,
+                self.files_finder.files_path.parent)
             
             new_content = self.markdown_formater.get_formatted_markdown_text()
 

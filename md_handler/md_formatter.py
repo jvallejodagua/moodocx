@@ -2,12 +2,15 @@
 # md_formatter.py
 
 import re
+from pathlib import Path
+from md_handler.ai_md_formatter import AIMdFormatter
 
 class MdFormatter:
     
-    def __init__(self, content):
+    def __init__(self, content, root_path):
         self.markdown_text = content
         self.numeral_counter = 0
+        self.root_path = root_path
     
     def apply_regex(self, pattern, replace):
         self.markdown_text= re.sub(
@@ -15,6 +18,10 @@ class MdFormatter:
             replace,
             self.markdown_text,
         )
+
+    def markdown_ai_format(self):
+        ai_formatter = AIMdFormatter(self.root_path)
+        self.markdown_text = ai_formatter.get_formatted_text_gemma(self.markdown_text)
 
     def remove_code_blocks(self):
         #code_block_pattern = re.compile(r'```.*?```',re.DOTALL)
@@ -111,6 +118,7 @@ class MdFormatter:
     # Función que reúne el formato standar del cuestionario
     def get_formatted_markdown_text(self):
         self.numeral_counter = 0
+        self.markdown_ai_format()
         self.remove_code_blocks()
         self.remove_comments_marks()
         self.format_literals()
