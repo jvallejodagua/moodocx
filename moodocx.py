@@ -309,6 +309,7 @@ class Moodocx:
                 await asyncio.to_thread(clase_instanciada.run) 
             except Exception as error:
                 self.texto_estado.value = f"Error en la ejecución: {error}"
+                print(error)
                 self.texto_estado.color = ft.Colors.RED
                 self.btn_ejecutar.disabled = False
                 self.page.update()

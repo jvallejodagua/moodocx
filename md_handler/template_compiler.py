@@ -1,7 +1,7 @@
 import re
 from typing import TypeAlias
-RegexStr: TypeAlias = str
-#from data_models.template_compiler_model import TemplateCompilerTask
+OrderList: TypeAlias = list[str]
+from data_models.template_compiler_model import TemplateCompilerTask
 FunctionDict: TypeAlias = dict
 
 class TemplateCompiler:
@@ -9,8 +9,8 @@ class TemplateCompiler:
     '''
     Sección para inicializar variables y ejecutar de modo automático
     '''
-    def __init__(self, output_regex: RegexStr, transformations: TemplateCompilerTask):
-        self.output_regex = RegexStr
+    def __init__(self, output_order: OrderList, transformations: TemplateCompilerTask):
+        self.output_order = output_order
         self.transformations = transformations
         self.groups = {}
 
@@ -42,6 +42,9 @@ class TemplateCompiler:
         else:
             print(f"Error: '{function_name}' no es llamable.")
 
+    '''
+    Funciones de proceso de grupos
+    '''
     def tabulate_paragraph(self, group_name):
         paragraph = self.groups[group_name]
         line_pattern = r'(?P<line>^.+$)'
@@ -49,14 +52,25 @@ class TemplateCompiler:
         tabbed_line_pattern = r'\t\g<line>'
         self.groups[group_name] = line_regex.sub(tabbed_line_pattern, paragraph)
     
+    '''
+    Funciones auxiliares de la clase
+    '''
     def get_groups(self, match):
         self.groups = match.groupdict()
+    
+    def get_output(self, order_list: OrderList) -> str:
+        output_text=""
+        for item in order_list:
+            if item in self.groups:
+                output_text += self.groups[item]
+            else:
+                output_text += item
     '''
     Función que se espera sea llamada por re.sub
     '''
     def __call__(self, match):
         self.get_groups(match)
-        self.execute_pipeline()
+        #self.execute_pipeline()
 
-        formatted_string = match.expand(self.output_regex)
+        formatted_string = self.get_output(self.output_order)
         return formatted_string

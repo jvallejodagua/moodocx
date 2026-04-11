@@ -1,9 +1,9 @@
 import re
 import sys
 from pathlib import Path
-#from md_handler.template_compiler import TemplateCompiler
-from template_compiler import TemplateCompiler
-#from data_models.template_compiler_model import TemplateCompilerTask, TemplateCompilerFunction
+from md_handler.template_compiler import TemplateCompiler
+#from template_compiler import TemplateCompiler
+from data_models.template_compiler_model import TemplateCompilerTask, TemplateCompilerFunction
 
 class TemplateFormatter:
 
@@ -28,41 +28,43 @@ class TemplateFormatter:
         self.last_added_text = r'(.+?)?(?:<!-- -->)?'
         self.pandoc_comment = r'(?:\n<!-- -->)?|\z'
         
-        numeral_search_key = "numeral_search"
-        punctuation_numeral_key = "punctuation_numeral"
-        empty_space_numeral_key = "empty_space_numeral"
-        accent_prompt_key = "accent_prompt"
-        prompt_key = "prompt"
-        added_prompt_text_key = "added_prompt_text"
-        new_line_A_key = "literal_A_new_line"
-        accent_mark_A_key = "accent_mark_A"
-        literal_A_key = "literal_A"
-        punctuation_separator_A_key = "punctuation_separator_A"
-        empty_space_A_key = "empty_space_A"
-        option_A_key = "option_A"
-        added_option_A_key = "added_option_A"
-        new_line_B_key = "literal_B_new_line"
-        accent_mark_B_key = "accent_mark_B"
-        literal_B_key = "literal_B"
-        punctuation_separator_B_key = "punctuation_separator_B"
-        empty_space_B_key = "empty_space_B"
-        option_B_key = "option_B"
-        added_option_B_key = "added_option_B"
-        new_line_C_key = "literal_C_new_line"
-        accent_mark_C_key = "accent_mark_C"
-        literal_C_key = "literal_C"
-        punctuation_separator_C_key = "punctuation_separator_C"
-        empty_space_C_key = "empty_space_C"
-        option_C_key = "option_C"
-        added_option_C_key = "added_option_C"
-        new_line_D_key = "literal_D_new_line"
-        accent_mark_D_key = "accent_mark_D"
-        literal_D_key = "literal_D"
-        punctuation_separator_D_key = "punctuation_separator_D"
-        empty_space_D_key = "empty_space_D"
-        option_D_key = "option_D"
-        added_option_D_key = "added_option_D"
-        pandoc_comment_key = "pandoc_comment"
+        self.output_punctuation = r'. '
+        
+        self.numeral_search_key = "numeral_search"
+        self.punctuation_numeral_key = "punctuation_numeral"
+        self.empty_space_numeral_key = "empty_space_numeral"
+        self.accent_prompt_key = "accent_prompt"
+        self.prompt_key = "prompt"
+        self.added_prompt_text_key = "added_prompt_text"
+        self.new_line_A_key = "literal_A_new_line"
+        self.accent_mark_A_key = "accent_mark_A"
+        self.literal_A_key = "literal_A"
+        self.punctuation_separator_A_key = "punctuation_separator_A"
+        self.empty_space_A_key = "empty_space_A"
+        self.option_A_key = "option_A"
+        self.added_option_A_key = "added_option_A"
+        self.new_line_B_key = "literal_B_new_line"
+        self.accent_mark_B_key = "accent_mark_B"
+        self.literal_B_key = "literal_B"
+        self.punctuation_separator_B_key = "punctuation_separator_B"
+        self.empty_space_B_key = "empty_space_B"
+        self.option_B_key = "option_B"
+        self.added_option_B_key = "added_option_B"
+        self.new_line_C_key = "literal_C_new_line"
+        self.accent_mark_C_key = "accent_mark_C"
+        self.literal_C_key = "literal_C"
+        self.punctuation_separator_C_key = "punctuation_separator_C"
+        self.empty_space_C_key = "empty_space_C"
+        self.option_C_key = "option_C"
+        self.added_option_C_key = "added_option_C"
+        self.new_line_D_key = "literal_D_new_line"
+        self.accent_mark_D_key = "accent_mark_D"
+        self.literal_D_key = "literal_D"
+        self.punctuation_separator_D_key = "punctuation_separator_D"
+        self.empty_space_D_key = "empty_space_D"
+        self.option_D_key = "option_D"
+        self.added_option_D_key = "added_option_D"
+        self.pandoc_comment_key = "pandoc_comment"
         
         
         
@@ -71,54 +73,54 @@ class TemplateFormatter:
         '''
         # Single line numerals regex
         self.single_line_pattern = {
-            numeral_search_key : self.numeral_character,
-            punctuation_numeral_key : self.punctuation_separator,
-            empty_space_numeral_key : self.space_character_but_new_line,
-            accent_prompt_key : self.accent_mark,
-            prompt_key : r'.*?',
-            accent_mark_A_key : self.accent_mark,
-            literal_A_key : self.literal_A_character,
-            punctuation_separator_A_key : self.punctuation_separator,
-            empty_space_A_key : self.space_character_but_new_line,
-            option_A_key : r'.*?',
-            accent_mark_B_key : self.accent_mark,
-            literal_B_key : self.literal_B_character,
-            punctuation_separator_B_key : self.punctuation_separator,
-            empty_space_B_key : self.space_character_but_new_line,
-            option_B_key : r'.*?',
-            accent_mark_C_key : self.accent_mark,
-            literal_C_key : self.literal_C_character,
-            punctuation_separator_C_key : self.punctuation_separator,
-            empty_space_C_key : self.space_character_but_new_line,
-            option_C_key : r'.*?',
-            accent_mark_D_key : self.accent_mark,
-            literal_D_key : self.literal_D_character,
-            punctuation_separator_D_key : self.punctuation_separator,
-            empty_space_D_key : self.space_character_but_new_line,
-            option_D_key : r'.*$'
+            self.numeral_search_key : self.numeral_character,
+            self.punctuation_numeral_key : self.punctuation_separator,
+            self.empty_space_numeral_key : self.space_character_but_new_line,
+            self.accent_prompt_key : self.accent_mark,
+            self.prompt_key : r'.*?',
+            self.accent_mark_A_key : self.accent_mark,
+            self.literal_A_key : self.literal_A_character,
+            self.punctuation_separator_A_key : self.punctuation_separator,
+            self.empty_space_A_key : self.space_character_but_new_line,
+            self.option_A_key : r'.*?',
+            self.accent_mark_B_key : self.accent_mark,
+            self.literal_B_key : self.literal_B_character,
+            self.punctuation_separator_B_key : self.punctuation_separator,
+            self.empty_space_B_key : self.space_character_but_new_line,
+            self.option_B_key : r'.*?',
+            self.accent_mark_C_key : self.accent_mark,
+            self.literal_C_key : self.literal_C_character,
+            self.punctuation_separator_C_key : self.punctuation_separator,
+            self.empty_space_C_key : self.space_character_but_new_line,
+            self.option_C_key : r'.*?',
+            self.accent_mark_D_key : self.accent_mark,
+            self.literal_D_key : self.literal_D_character,
+            self.punctuation_separator_D_key : self.punctuation_separator,
+            self.empty_space_D_key : self.space_character_but_new_line,
+            self.option_D_key : r'.*$'
         }
         # Single line formatted question pattern
         self.ouput_single_line = self.build_search_pattern(
-            rf'g<{numeral_search_key}>',
-            r'. ',
-            rf'g<{accent_prompt_key}>',
-            r'\g<prompt>\n\n\t',
-            rf'g<{literal_A_key}>',
-            r'. ',
-            rf'g<{accent_mark_A_key}>',
-            r'\g<option_A>\n\n\t',
-            r'\g<literal_B>',
-            r'. ',
-            r'\g<accent_mark_B>',
-            r'\g<option_B>\n\n\t',
-            r'\g<literal_C>',
-            r'. ',
-            r'\g<accent_mark_C>',
-            r'\g<option_C>\n\n\t',
-            r'\g<literal_D>',
-            r'. ',
-            r'\g<accent_mark_D>',
-            r'\g<option_D>\n\n',
+            rf'\g<{self.numeral_search_key}>',
+            self.output_punctuation,
+            rf'\g<{self.accent_prompt_key}>',
+            rf'\g<{self.prompt_key}>\n\n\t',
+            rf'\g<{self.literal_A_key}>',
+            self.output_punctuation,
+            rf'\g<{self.accent_mark_A_key}>',
+            rf'\g<{self.option_A_key}>\n\n\t',
+            rf'\g<{self.literal_B_key}>',
+            self.output_punctuation,
+            rf'\g<{self.accent_mark_B_key}>',
+            rf'\g<{self.option_B_key}>\n\n\t',
+            rf'\g<{self.literal_C_key}>',
+            self.output_punctuation,
+            rf'\g<{self.accent_mark_C_key}>',
+            rf'\g<{self.option_C_key}>\n\n\t',
+            rf'\g<{self.literal_D_key}>',
+            self.output_punctuation,
+            rf'\g<{self.accent_mark_D_key}>',
+            rf'\g<{self.option_D_key}>\n\n',
         )
 
         '''
@@ -126,68 +128,101 @@ class TemplateFormatter:
         '''
         # Multiple line numerals regex
         self.multiple_line_pattern = {
-            numeral_search_key : self.numeral_character,
-            punctuation_numeral_key : self.punctuation_separator,
-            empty_space_numeral_key : self.space_character_but_new_line,
-            accent_prompt_key : self.accent_mark,
-            prompt_key : self.one_line,
-            added_prompt_text_key : self.get_interine_text(self.literal_A_character),
-            new_line_A_key : self.new_line,
-            accent_mark_A_key : self.accent_mark,
-            literal_A_key : self.literal_A_character,
-            punctuation_separator_A_key : self.punctuation_separator,
-            empty_space_A_key : self.space_character_but_new_line,
-            option_A_key : self.one_line,
-            added_option_A_key : self.get_interine_text(self.literal_B_character),
-            new_line_B_key : self.new_line,
-            accent_mark_B_key : self.accent_mark,
-            literal_B_key : self.literal_B_character,
-            punctuation_separator_B_key : self.punctuation_separator,
-            empty_space_B_key : self.space_character_but_new_line,
-            option_B_key : self.one_line,
-            added_option_B_key : self.get_interine_text(self.literal_C_character),
-            new_line_C_key : self.new_line,
-            accent_mark_C_key : self.accent_mark,
-            literal_C_key : self.literal_C_character,
-            punctuation_separator_C_key : self.punctuation_separator,
-            empty_space_C_key : self.space_character_but_new_line,
-            option_C_key : r'.*?',
-            added_option_C_key : self.get_interine_text(self.literal_D_character),
-            new_line_D_key : self.new_line,
-            accent_mark_D_key : self.accent_mark,
-            literal_D_key : self.literal_D_character,
-            punctuation_separator_D_key : self.punctuation_separator,
-            empty_space_D_key : self.space_character_but_new_line,
-            option_D_key : self.one_line,
-            added_option_D_key : self.last_added_text,
-            pandoc_comment_key : self.pandoc_comment,
+            self.numeral_search_key : self.numeral_character,
+            self.punctuation_numeral_key : self.punctuation_separator,
+            self.empty_space_numeral_key : self.space_character_but_new_line,
+            self.accent_prompt_key : self.accent_mark,
+            self.prompt_key : self.one_line,
+            self.added_prompt_text_key : self.get_interine_text(self.literal_A_character),
+            self.new_line_A_key : self.new_line,
+            self.accent_mark_A_key : self.accent_mark,
+            self.literal_A_key : self.literal_A_character,
+            self.punctuation_separator_A_key : self.punctuation_separator,
+            self.empty_space_A_key : self.space_character_but_new_line,
+            self.option_A_key : self.one_line,
+            self.added_option_A_key : self.get_interine_text(self.literal_B_character),
+            self.new_line_B_key : self.new_line,
+            self.accent_mark_B_key : self.accent_mark,
+            self.literal_B_key : self.literal_B_character,
+            self.punctuation_separator_B_key : self.punctuation_separator,
+            self.empty_space_B_key : self.space_character_but_new_line,
+            self.option_B_key : self.one_line,
+            self.added_option_B_key : self.get_interine_text(self.literal_C_character),
+            self.new_line_C_key : self.new_line,
+            self.accent_mark_C_key : self.accent_mark,
+            self.literal_C_key : self.literal_C_character,
+            self.punctuation_separator_C_key : self.punctuation_separator,
+            self.empty_space_C_key : self.space_character_but_new_line,
+            self.option_C_key : self.one_line,
+            self.added_option_C_key : self.get_interine_text(self.literal_D_character),
+            self.new_line_D_key : self.new_line,
+            self.accent_mark_D_key : self.accent_mark,
+            self.literal_D_key : self.literal_D_character,
+            self.punctuation_separator_D_key : self.punctuation_separator,
+            self.empty_space_D_key : self.space_character_but_new_line,
+            self.option_D_key : self.one_line,
+            self.added_option_D_key : self.last_added_text,
+            self.pandoc_comment_key : self.pandoc_comment,
         }
 
         # Multiple line formatted question pattern
         self.ouput_multiple_line = self.build_search_pattern(
-            # rf'g<{numeral_search_key}>',
-            # r'. ',
-            # rf'g<{accent_prompt_key}>',
-            # rf'g<{prompt_key}>',
-            # rf'\g<{added_prompt_text_key}>',
-            # rf'g<{literal_A_key}>',
-            # r'. ',
-            # rf'g<{accent_mark_A_key}>',
-            # rf'g<{option_A_key}>',
-            # rf'\g<{added_option_A_key}>'
-            # r'\g<literal_B>',
-            # r'. ',
-            # r'\g<accent_mark_B>',
-            # r'\g<option_B>\n\n\t',
-            # r'\g<literal_C>',
-            # r'. ',
-            # r'\g<accent_mark_C>',
-            # r'\g<option_C>\n\n\t',
-            # r'\g<literal_D>',
-            # r'. ',
-            # r'\g<accent_mark_D>',
-            # r'\g<option_D>\n\n',
+            # rf'\g<{self.numeral_search_key}>',
+            # self.output_punctuation,
+            # rf'\g<{self.accent_prompt_key}>',
+            # rf'\g<{self.prompt_key}>',
+            # rf'\g<{self.added_prompt_text_key}>',
+            # rf'\g<{self.literal_A_key}>',
+            # self.output_punctuation,
+            # rf'\g<{self.accent_mark_A_key}>',
+            # rf'\g<{self.option_A_key}>',
+            # rf'\g<{self.added_option_A_key}>'
+            # rf'\g<{self.literal_B_key}>',
+            # self.output_punctuation,
+            # rf'\g<{self.accent_mark_B_key}>',
+            # rf'\g<{self.option_B_key}>',
+            # rf'\g<{self.literal_C_key}>',
+            # self.output_punctuation,
+            # rf'\g<{self.accent_mark_C_key}>',
+            # rf'\g<{self.option_C_key}>',
+            # rf'\g<{self.literal_D_key}>',
+            # self.output_punctuation,
+            # rf'\g<{self.accent_mark_D_key}>',
+            # rf'\g<{self.option_D_key}>',
         )
+
+        self.output_multiline_list = [
+            self.numeral_search_key,
+            self.output_punctuation,
+            self.accent_prompt_key,
+            self.prompt_key,
+            self.added_prompt_text_key,
+            self.new_line_A_key,
+            self.literal_A_key,
+            self.output_punctuation,
+            self.accent_mark_A_key,
+            self.option_A_key,
+            self.added_option_A_key,
+            self.new_line_B_key,
+            self.literal_B_key,
+            self.output_punctuation,
+            self.accent_mark_B_key,
+            self.option_B_key,
+            self.added_option_B_key,
+            self.new_line_C_key,
+            self.literal_C_key,
+            self.output_punctuation,
+            self.accent_mark_C_key,
+            self.option_C_key,
+            self.added_option_C_key,
+            self.new_line_D_key,
+            self.literal_D_key,
+            self.output_punctuation,
+            self.accent_mark_D_key,
+            self.option_D_key,
+            self.added_option_D_key,
+            self.pandoc_comment_key,
+        ]
     # def replace_empty_html_comment(self, content):
     #     replaced_string = content
     #     html_code = r'<!-- -->'
@@ -247,12 +282,22 @@ class TemplateFormatter:
         self.build_multiple_line_pattern_list()
         self.build_regex()
         
-
-
         question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
+
+        # Tabulate added texts
+        tabulate_added_prompt = TemplateCompilerFunction(
+            function_name = "tabulate_paragraph",
+            args = [self.added_prompt_text_key]
+        )
+        tabulate_quiz_paragraphs = TemplateCompilerTask(
+            task_id = "tabulate_quiz",
+            functions = [tabulate_added_prompt]
+        )
+
         template_compiler = TemplateCompiler(
-            self.ouput_multiple_line,
-            '')
+            output_order = self.output_multiline_list,
+            transformations = tabulate_quiz_paragraphs,
+        )
         quiz = question_pattern.sub(template_compiler, self.raw_text)
         
         return quiz

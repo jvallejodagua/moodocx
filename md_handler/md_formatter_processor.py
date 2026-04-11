@@ -3,6 +3,7 @@
 
 import re
 from md_handler.md_formatter import MdFormatter
+from md_handler.template_formatter import TemplateFormatter
 from filesystem.files_finder import FilesInSubfolder
 import time
 
@@ -25,10 +26,11 @@ class MdFormatterProcessor:
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            self.markdown_formater = MdFormatter(content)
+            #self.markdown_formater = MdFormatter(content)
+            #new_content = self.markdown_formater.get_formatted_markdown_text()
+            self.markdown_formater = TemplateFormatter(content)
+            new_content = self.markdown_formater.fix_quiz_multiple_line_numerals()
             
-            new_content = self.markdown_formater.get_formatted_markdown_text()
-
             print(f"Se escribe {file}")
             with open(file, 'w', encoding='utf-8') as f2:
                 f2.write(new_content)
