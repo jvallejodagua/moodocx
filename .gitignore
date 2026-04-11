@@ -6,3 +6,6 @@ __pycache__/
 build/
 dist/
 moodocx.spec
+**.gguf
+log_arranque.txt
+docs_gemma
