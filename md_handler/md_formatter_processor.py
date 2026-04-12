@@ -2,15 +2,16 @@
 # md_formatter_processor.py
 
 import re
-from md_handler.md_formatter import MdFormatter
+from md_handler.sequence_formatter import SequenceFormatter
 from md_handler.template_formatter import TemplateFormatter
 from filesystem.files_finder import FilesInSubfolder
 import time
 
-class MdFormatterProcessor:
+class SequenceFormatterProcessor:
     
     def __init__(self, source_directory: str):
-        self.markdown_formater = None
+        self.template_formater = None
+        self.sequence_formatter = None
         self.files_finder = FilesInSubfolder(
             route_to_subfolder = source_directory,
             suffix_extension = ".md",
@@ -26,10 +27,14 @@ class MdFormatterProcessor:
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            #self.markdown_formater = MdFormatter(content)
-            #new_content = self.markdown_formater.get_formatted_markdown_text()
-            self.markdown_formater = TemplateFormatter(content)
-            new_content = self.markdown_formater.fix_quiz_multiple_line_numerals()
+            #self.template_formater = SequenceFormatter(content)
+            #new_content = self.template_formater.get_formatted_markdown_text()
+            self.template_formater = TemplateFormatter(content)
+            fixed_template_content = self.template_formater.format_multiline_quiz()
+            
+            self.sequence_formatter = SequenceFormatter(fixed_template_content)
+            new_content = self.sequence_formatter.get_formatted_text()
+            # new_content = self.template_formater.test_multiple_line_numerals()
             
             print(f"Se escribe {file}")
             with open(file, 'w', encoding='utf-8') as f2:

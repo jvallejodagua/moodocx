@@ -2,22 +2,24 @@ import re
 from typing import TypeAlias
 OrderList: TypeAlias = list[str]
 from data_models.template_compiler_model import TemplateCompilerTask
+from md_handler.formatter_abstract import FormatterAbstract
 FunctionDict: TypeAlias = dict
 
-class TemplateCompiler:
+class TemplateCompiler(FormatterAbstract):
     
     '''
     Sección para inicializar variables y ejecutar de modo automático
     '''
     def __init__(self, output_order: OrderList, transformations: TemplateCompilerTask):
+        super().__init__()
         self.output_order = output_order
         self.transformations = transformations
         self.groups = {}
 
     def execute_pipeline(self):
-        
-        for config in self.transformations.functions:
-            self.call_function(config)
+        if self.transformations:
+            for config in self.transformations.functions:
+                self.call_function(config)
 
     def call_function(self, config):
         
@@ -44,13 +46,53 @@ class TemplateCompiler:
     '''
     Funciones de proceso de grupos
     '''
-    def tabulate_paragraph(self, group_name):
-        paragraph = self.groups[group_name]
-        line_pattern = r'(?P<line>^.+$)'
-        line_regex = re.compile(line_pattern, re.MULTILINE)
-        tabbed_line_pattern = r'\t\g<line>'
-        self.groups[group_name] = line_regex.sub(tabbed_line_pattern, paragraph)
-    
+    def upper_literals(self, *group_names):
+        for group_name in group_names:
+            literal = self.groups[group_name]
+            
+            self.groups[group_name] = literal.upper()
+
+    def delete_comment_marks(self, *group_names):
+        for group_name in group_names:
+            paragraph = self.groups[group_name]
+            comment_mark_pattern = (
+                rf'^>(?:{self.space_character_but_new_line})?(.*)({self.new_line})?'
+            )
+            comment_mark_regex = re.compile(comment_mark_pattern, re.MULTILINE)
+
+            no_comment_pattern = r'\1\2'
+            self.groups[group_name] = comment_mark_regex.sub(no_comment_pattern, paragraph)
+
+    def delete_code_blocks(self, *group_names):
+        for group_name in group_names:
+            paragraph = self.groups[group_name]
+            code_block_pattern = (
+                rf'{self.code_block_pattern}'
+            )
+            code_block_regex = re.compile(code_block_pattern, re.MULTILINE)
+
+            no_code_block_pattern = r''
+            self.groups[group_name] = code_block_regex.sub(no_code_block_pattern, paragraph)
+
+    def convert_marks_to_bold(self, *group_names):
+        for group_name in group_names:
+            paragraph = self.groups[group_name]
+            marks_pattern = (
+                rf'{self.bracket_mark}'
+            )
+            marks_regex = re.compile(marks_pattern)
+
+            mark_to_bold_pattern = r'**\1**'
+            self.groups[group_name] = marks_regex.sub(mark_to_bold_pattern, paragraph)
+
+    def tabulate_paragraph(self, *group_names):
+        for group_name in group_names:
+            paragraph = self.groups[group_name]
+            line_pattern = r'(?P<line>^.+$)'
+            line_regex = re.compile(line_pattern, re.MULTILINE)
+            tabbed_line_pattern = r'\t\g<line>'
+            self.groups[group_name] = line_regex.sub(tabbed_line_pattern, paragraph)
+
     '''
     Funciones auxiliares de la clase
     '''

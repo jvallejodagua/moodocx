@@ -12,7 +12,7 @@ from pandoc_handler.md_quiz_to_docx_converter import MdQuizToDocxConverter
 from latex_handler.latex_formulas_to_png_converter import LaTeXFormulasToPngConverter
 from latex_handler.latex_tables_to_png_converter import LaTeXTablesToPngConverter
 from xml_handler.pydantic_to_moodle_xml_converter import PydanticToMoodleXmlConverter
-from md_handler.md_formatter_processor import MdFormatterProcessor
+from md_handler.md_formatter_processor import SequenceFormatterProcessor
 
 class Moodocx:
     """
@@ -115,7 +115,7 @@ class Moodocx:
         
         self.procesador_word = DocxToMdConverter(source_directory = self.temporals_path)
 
-        self.formateador_markdown = MdFormatterProcessor(source_directory = self.temporals_path)
+        self.formateador_markdown = SequenceFormatterProcessor(source_directory = self.temporals_path)
 
         self.procesador_tablas = LaTeXTablesToPngConverter(
             self.chk_texto_ayuda.value,
