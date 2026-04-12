@@ -17,25 +17,24 @@ class TemplateCompiler:
     def execute_pipeline(self):
         
         for config in self.transformations.functions:
-            call_function(config)
+            self.call_function(config)
 
     def call_function(self, config):
-
+        
         function_name = config.function_name
         args = config.args
         kwargs = config.kwargs
 
         if hasattr(self, function_name):
-            execute_function(self.task_id, function_name, args, kwargs)
+            self.execute_function(function_name, *args, **kwargs)
         else:
-            resultados[self.task_id] = f"Error: Función '{function_name}' no encontrada."
+            resultados[self.transformations.task_id] = f"Error: Función '{function_name}' no encontrada."
 
     def execute_function(self, function_name, *args, **kwargs):
         function = getattr(self, function_name)
         
         if callable(function):
             try:
-                print(f"[Ejecutando] Tarea: {self.transformations.task_id} -> Método: {function_name}()")
                 function(*args, **kwargs)
             except Exception as e:
                 print(f"Error en ejecución: {str(e)}")
@@ -61,16 +60,18 @@ class TemplateCompiler:
     def get_output(self, order_list: OrderList) -> str:
         output_text=""
         for item in order_list:
-            if item in self.groups:
+            if item in self.groups.keys():
                 output_text += self.groups[item]
             else:
                 output_text += item
+        
+        return output_text
     '''
     Función que se espera sea llamada por re.sub
     '''
     def __call__(self, match):
         self.get_groups(match)
-        #self.execute_pipeline()
-
+        self.execute_pipeline()
+        
         formatted_string = self.get_output(self.output_order)
         return formatted_string

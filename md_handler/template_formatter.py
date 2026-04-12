@@ -281,9 +281,8 @@ class TemplateFormatter:
     def fix_quiz_multiple_line_numerals(self):
         self.build_multiple_line_pattern_list()
         self.build_regex()
-        
         question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
-
+        
         # Tabulate added texts
         tabulate_added_prompt = TemplateCompilerFunction(
             function_name = "tabulate_paragraph",
