@@ -15,12 +15,15 @@ class FormatterAbstract:
         self.literal_C_character = r'[cC]'
         self.literal_D_character = r'[dD]'
         self.soft_new_line = r'\\\n'
-        
+        self.pandoc_comment_raw = r'<!-- -->'
+        self.worng_italic_mark = r'\*{3}'
+        self.worng_bold_mark = r'\*{4}'
+
         # Dotall
         self.one_line_dotall = r'[^\n]+'
-        self.last_added_text = r'.+?(?=<!-- -->|\z)'
-        self.pandoc_comment = r'(<!-- -->)?|\z'
-
+        self.last_added_text = rf'.+?(?={self.pandoc_comment_raw}|\z)'
+        self.pandoc_comment = rf'({self.pandoc_comment_raw})?|\z'
+        
         # Multiline 
         self.raw_chunk_multiline = r'.*?'
         self.to_end_chunk_multiline = r'.*$'
@@ -37,10 +40,13 @@ class FormatterAbstract:
         self.output_punctuation = r'. '
         self.simple_new_line = r'\n'
         self.md_newline = r'\n\n'
+        self.italic_mark = '*'
+        self.bold_mark = '**'
         
         '''
         Regex dictionary keys
         '''
+        self.accent_mark_numeral_key = "accent_mark_numeral"
         self.numeral_search_key = "numeral_search"
         self.punctuation_numeral_key = "punctuation_numeral"
         self.empty_space_numeral_key = "empty_space_numeral"
@@ -113,23 +119,24 @@ class FormatterAbstract:
             rf'\g<{self.numeral_search_key}>',
             self.output_punctuation,
             rf'\g<{self.accent_prompt_key}>',
-            rf'\g<{self.prompt_key}>\n\n\t',
+            rf'\g<{self.prompt_key}>\n\n',
             rf'\g<{self.literal_A_key}>',
             self.output_punctuation,
             rf'\g<{self.accent_mark_A_key}>',
-            rf'\g<{self.option_A_key}>\n\n\t',
+            rf'\g<{self.option_A_key}>\n\n',
             rf'\g<{self.literal_B_key}>',
             self.output_punctuation,
             rf'\g<{self.accent_mark_B_key}>',
-            rf'\g<{self.option_B_key}>\n\n\t',
+            rf'\g<{self.option_B_key}>\n\n',
             rf'\g<{self.literal_C_key}>',
             self.output_punctuation,
             rf'\g<{self.accent_mark_C_key}>',
-            rf'\g<{self.option_C_key}>\n\n\t',
+            rf'\g<{self.option_C_key}>\n\n',
             rf'\g<{self.literal_D_key}>',
             self.output_punctuation,
             rf'\g<{self.accent_mark_D_key}>',
             rf'\g<{self.option_D_key}>\n\n',
+            rf'{self.pandoc_comment_raw}',
         )
 
         '''
@@ -137,6 +144,7 @@ class FormatterAbstract:
         '''
         # Multiline numerals regex
         self.multiline_pattern = {
+            self.accent_mark_numeral_key : self.accent_mark,
             self.numeral_search_key : self.numeral_character,
             self.punctuation_numeral_key : self.punctuation_separator,
             self.empty_space_numeral_key : self.space_character_but_new_line,
@@ -204,6 +212,7 @@ class FormatterAbstract:
         self.output_multiline_list = [
             self.numeral_search_key,
             self.output_punctuation,
+            self.accent_mark_numeral_key,
             self.accent_prompt_key,
             self.prompt_key,
             self.added_prompt_text_key,

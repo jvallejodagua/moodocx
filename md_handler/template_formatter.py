@@ -50,7 +50,7 @@ class TemplateFormatter(FormatterAbstract):
     '''
     Main Functions
     '''
-    def fix_quiz_single_line_numerals(self):
+    def reorder_singleline_quiz(self):
         self.build_single_line_pattern_list()
         self.build_regex()
         
@@ -152,6 +152,17 @@ class TemplateFormatter(FormatterAbstract):
         )
         
         quiz_formatted = question_pattern.sub(template_compiler, self.raw_text)
+
+        # This is an odd edge case
+        # quiz_fixed_italic_marks = self.fix_single_aspect(
+        #     self.worng_italic_mark,
+        #     self.italic_mark,
+        #     quiz_formatted)
+
+        # quiz_fixed_bold_marks = self.fix_single_aspect(
+        #     self.worng_bold_mark,
+        #     self.bold_mark,
+        #     quiz_fixed_italic_marks)
 
         quiz_fixed_soft_new_lines = self.fix_single_aspect(
             self.soft_new_line,
