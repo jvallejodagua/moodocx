@@ -10,29 +10,28 @@ class TemplateFormatter(FormatterAbstract):
 
     def __init__(self, content):
         super().__init__()
-        #¿Cuándo ocurren los otros caracteres vacíos?
-        #empty_characters_pattern = r'[\r\x0b\x0c\u200b\ufeff]'
-
-        #Retroceso de carro para limpiar
-        empty_characters_pattern = r'[\r]'
-        self.raw_text = re.sub(empty_characters_pattern,'',content)
+        self.raw_text = content
         self.pattern_list = []
         self.question_regex = None
 
     # Conectores a las posibles entradas
     def build_single_line_pattern_list(self):
         for regex_id, pattern_value in self.single_line_pattern.items():
-            self.pattern_list.append(self.build_group_regex(regex_id, pattern_value))
+            self.pattern_list.append(self.build_group_simple_regex(regex_id, pattern_value))
 
     def build_multiline_pattern_list(self):
         for regex_id, pattern_value in self.multiline_pattern.items():
-            self.pattern_list.append(self.build_group_regex(regex_id, pattern_value))
+            self.pattern_list.append(self.build_group_atomic_regex(regex_id, pattern_value))
+
+    def build_singleline_option_pattern_list(self):
+        for regex_id, pattern_value in self.singleline_option_pattern.items():
+            self.pattern_list.append(self.build_group_atomic_regex(regex_id, pattern_value))
 
     def build_regex(self):
         question_search_pattern = self.build_search_pattern(*self.pattern_list)
-        self.question_regex = self.build_group_regex(
+        self.question_regex = self.build_group_atomic_regex(
             "question",
-            question_search_pattern,
+            rf'{question_search_pattern}',
         )
 
     '''
@@ -46,7 +45,7 @@ class TemplateFormatter(FormatterAbstract):
         fixed_content = input_pattern_regex.sub(ouput_pattern, content)
 
         return fixed_content
-
+    
     '''
     Main Functions
     '''
@@ -59,23 +58,10 @@ class TemplateFormatter(FormatterAbstract):
         
         return quiz
 
-    def reorder_multiline_quiz(self):
-        self.build_multiline_pattern_list()
-        self.build_regex()
-        question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
-        
-        template_compiler = TemplateCompiler(
-            output_order = self.output_multiline_list,
-            transformations = [],
-        )
-        
-        quiz = question_pattern.sub(template_compiler, self.raw_text)
-        
-        return quiz
-
     def format_multiline_quiz(self):
         self.build_multiline_pattern_list()
         self.build_regex()
+        
         question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
         
         upper_literals =  TemplateCompilerFunction(
@@ -163,6 +149,89 @@ class TemplateFormatter(FormatterAbstract):
         #     self.worng_bold_mark,
         #     self.bold_mark,
         #     quiz_fixed_italic_marks)
+
+        quiz_fixed_soft_new_lines = self.fix_single_aspect(
+            self.soft_new_line,
+            self.simple_new_line,
+            quiz_formatted)
+
+        quiz_fixed_new_lines = self.fix_single_aspect(
+            self.new_line,
+            self.md_newline,
+            quiz_fixed_soft_new_lines)
+
+
+        quiz = quiz_fixed_new_lines
+
+        return quiz
+    
+    def format_singleline_option_quiz(self):
+        self.build_singleline_option_pattern_list()
+        self.build_regex()
+        question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
+
+        upper_literals =  TemplateCompilerFunction(
+            function_name = "upper_literals",
+            args = [
+                self.literal_A_key,
+                self.literal_B_key,
+                self.literal_C_key,
+                self.literal_D_key
+            ]
+        )
+
+        delete_comment_marks = TemplateCompilerFunction(
+            function_name = "delete_comment_marks",
+            args = [
+                self.added_prompt_text_key
+            ]
+        )
+
+        delete_code_blocks = TemplateCompilerFunction(
+            function_name = "delete_code_blocks",
+            args = [
+                self.added_prompt_text_key
+            ]
+        )
+
+        convert_marks_to_bold = TemplateCompilerFunction(
+            function_name = "convert_marks_to_bold",
+            args = [
+                self.option_A_key,
+                self.option_B_key,
+                self.option_C_key,
+                self.option_D_key
+            ]
+        )
+        
+        tabulate_paragraphs = TemplateCompilerFunction(
+            function_name = "tabulate_paragraph",
+            args = [
+                self.added_prompt_text_key,
+                self.literal_A_key,
+                self.literal_B_key,
+                self.literal_C_key,
+                self.literal_D_key,
+            ]
+        )
+        
+        format_quiz = TemplateCompilerTask(
+            task_id = "format_quiz",
+            functions = [
+                upper_literals,
+                delete_comment_marks,
+                delete_code_blocks,
+                convert_marks_to_bold,
+                tabulate_paragraphs
+            ]
+        )
+        
+        template_compiler = TemplateCompiler(
+            output_order = self.output_singleline_option_list,
+            transformations = format_quiz,
+        )
+        
+        quiz_formatted = question_pattern.sub(template_compiler, self.raw_text)
 
         quiz_fixed_soft_new_lines = self.fix_single_aspect(
             self.soft_new_line,

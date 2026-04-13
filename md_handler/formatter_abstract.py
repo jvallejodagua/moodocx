@@ -18,21 +18,23 @@ class FormatterAbstract:
         self.pandoc_comment_raw = r'<!-- -->'
         self.worng_italic_mark = r'\*{3}'
         self.worng_bold_mark = r'\*{4}'
-
+        self.comment_mark = r'^>'
         # Dotall
         self.one_line_dotall = r'[^\n]+'
-        self.last_added_text = rf'.+?(?={self.pandoc_comment_raw}|\z)'
-        self.pandoc_comment = rf'({self.pandoc_comment_raw})?|\z'
+        # self.last_added_text = rf'.+?(?=\n{self.pandoc_comment_raw}\n)'
+        self.last_added_text = rf'.*?(?=\n{self.pandoc_comment_raw}\n)'
+        self.pandoc_comment = rf'\n{self.pandoc_comment_raw}\n'
+        self.end_document = r'\Z'
         
         # Multiline 
-        self.raw_chunk_multiline = r'.*?'
+        self.raw_chunk_multiline = r'.+?'
         self.to_end_chunk_multiline = r'.*$'
         
         # No Flags
         self.bracket_mark = r'\[(.+?)\]\{.+?\}'
         self.code_block_pattern = (
             rf'```[\s\S]*?```\s*|'
-            rf'{self.pandoc_comment}'
+            rf'{self.pandoc_comment_raw}'
         )
         self.windows_r_chars = r'\r'
         
@@ -48,6 +50,7 @@ class FormatterAbstract:
         '''
         self.accent_mark_numeral_key = "accent_mark_numeral"
         self.numeral_search_key = "numeral_search"
+        self.accent_mark_post_numeral_key = "accent_mark_post_numeral"
         self.punctuation_numeral_key = "punctuation_numeral"
         self.empty_space_numeral_key = "empty_space_numeral"
         self.accent_prompt_key = "accent_prompt"
@@ -88,7 +91,9 @@ class FormatterAbstract:
         '''
         # Single line numerals regex
         self.single_line_pattern = {
+            self.accent_mark_numeral_key : self.accent_mark,
             self.numeral_search_key : self.numeral_character,
+            self.accent_mark_post_numeral_key : self.accent_mark,
             self.punctuation_numeral_key : self.punctuation_separator,
             self.empty_space_numeral_key : self.space_character_but_new_line,
             self.accent_prompt_key : self.accent_mark,
@@ -118,6 +123,8 @@ class FormatterAbstract:
         self.ouput_single_line_order = self.build_search_pattern(
             rf'\g<{self.numeral_search_key}>',
             self.output_punctuation,
+            rf'\g<{self.accent_mark_numeral_key}>',
+            rf'\g<{self.accent_mark_post_numeral_key}>',
             rf'\g<{self.accent_prompt_key}>',
             rf'\g<{self.prompt_key}>\n\n',
             rf'\g<{self.literal_A_key}>',
@@ -147,6 +154,7 @@ class FormatterAbstract:
             self.accent_mark_numeral_key : self.accent_mark,
             self.numeral_search_key : self.numeral_character,
             self.punctuation_numeral_key : self.punctuation_separator,
+            self.accent_mark_post_numeral_key : self.accent_mark,
             self.empty_space_numeral_key : self.space_character_but_new_line,
             self.accent_prompt_key : self.accent_mark,
             self.prompt_key : self.one_line_dotall,
@@ -215,6 +223,7 @@ class FormatterAbstract:
             self.accent_mark_numeral_key,
             self.accent_prompt_key,
             self.prompt_key,
+            self.accent_mark_post_numeral_key,
             self.added_prompt_text_key,
             self.new_line_A_key,
             self.literal_A_key,
@@ -243,6 +252,72 @@ class FormatterAbstract:
             # self.pandoc_comment_key
         ]
 
+        # Singleline option regex
+        self.singleline_option_pattern = {
+            self.accent_mark_numeral_key : self.accent_mark,
+            self.numeral_search_key : self.numeral_character,
+            self.punctuation_numeral_key : self.punctuation_separator,
+            self.accent_mark_post_numeral_key : self.accent_mark,
+            self.empty_space_numeral_key : self.space_character_but_new_line,
+            self.accent_prompt_key : self.accent_mark,
+            self.prompt_key : self.one_line_dotall,
+            self.added_prompt_text_key : self.get_interine_text(self.literal_A_character),
+            self.new_line_A_key : self.new_line,
+            self.accent_mark_A_key : self.accent_mark,
+            self.literal_A_key : self.literal_A_character,
+            self.punctuation_separator_A_key : self.punctuation_separator,
+            self.empty_space_A_key : self.space_character_but_new_line,
+            self.option_A_key : self.one_line_dotall,
+            self.new_line_B_key : self.new_line,
+            self.accent_mark_B_key : self.accent_mark,
+            self.literal_B_key : self.literal_B_character,
+            self.punctuation_separator_B_key : self.punctuation_separator,
+            self.empty_space_B_key : self.space_character_but_new_line,
+            self.option_B_key : self.one_line_dotall,
+            self.new_line_C_key : self.new_line,
+            self.accent_mark_C_key : self.accent_mark,
+            self.literal_C_key : self.literal_C_character,
+            self.punctuation_separator_C_key : self.punctuation_separator,
+            self.empty_space_C_key : self.space_character_but_new_line,
+            self.option_C_key : self.one_line_dotall,
+            self.new_line_D_key : self.new_line,
+            self.accent_mark_D_key : self.accent_mark,
+            self.literal_D_key : self.literal_D_character,
+            self.punctuation_separator_D_key : self.punctuation_separator,
+            self.empty_space_D_key : self.space_character_but_new_line,
+            self.option_D_key : self.one_line_dotall,
+        }
+    
+        self.output_singleline_option_list = [
+            self.numeral_search_key,
+            self.output_punctuation,
+            self.accent_mark_numeral_key,
+            self.accent_prompt_key,
+            self.prompt_key,
+            self.accent_mark_post_numeral_key,
+            self.added_prompt_text_key,
+            self.new_line_A_key,
+            self.literal_A_key,
+            self.output_punctuation,
+            self.accent_mark_A_key,
+            self.option_A_key,
+            self.new_line_B_key,
+            self.literal_B_key,
+            self.output_punctuation,
+            self.accent_mark_B_key,
+            self.option_B_key,
+            self.new_line_C_key,
+            self.literal_C_key,
+            self.output_punctuation,
+            self.accent_mark_C_key,
+            self.option_C_key,
+            self.new_line_D_key,
+            self.literal_D_key,
+            self.output_punctuation,
+            self.accent_mark_D_key,
+            self.option_D_key,
+        ]
+
     def build_search_pattern(self, *args):
         search_pattern=""
         for arg in args:
@@ -259,5 +334,8 @@ class FormatterAbstract:
             rf'{self.space_character_but_new_line})'
         )
 
-    def build_group_regex(self, pattern_name, search_pattern):
+    def build_group_atomic_regex(self, pattern_name, search_pattern):
+        return rf'(?P<{pattern_name}>(?>{search_pattern}))'
+
+    def build_group_simple_regex(self, pattern_name, search_pattern):
         return rf'(?P<{pattern_name}>{search_pattern})'
