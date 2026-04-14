@@ -1,1 +1,28 @@
-"{\"document_elements\": [{\"content\": \"**Examen de Ciencias**\", \"element_type\": \"texto_contexto\"}, {\"content\": \"Lee esto:\\nEl sol es una estrella.\", \"element_type\": \"texto_contexto\"}, {\"question_number\": 1, \"content\": \"¿Qué es el sol?\", \"element_type\": \"enunciado_pregunta\"}, {\"option_letter\": \"A\", \"content\": \"**Un planeta**\", \"element_type\": \"opcion_respuesta\"}, {\"option_letter\": \"B\", \"content\": \"Una estrella\", \"element_type\": \"opcion_respuesta\"}, {\"content\": \"**Examen de informática**\", \"element_type\": \"texto_contexto\"}, {\"question_number\": 1, \"content\": \"El pc es:\n\t{\"content\": \"**Examen de informática**\", \"element_type\": \"texto_contexto\"}\", \"element_type\": \"enunciado_pregunta\"}, {\"option_letter\": \"A\", \"content\": \"**Un planeta**\", \"element_type\": \"opcion_respuesta\"}, {\"option_letter\": \"B\", \"content\": \"Una estrella\", \"element_type\": \"opcion_respuesta\"}]}"
+**Examen de Ciencias**
+
+Lee esto:
+
+El sol es una estrella.
+
+De acuerdo al texto responde:
+
+1. ¿Qué es el sol?
+
+    A. **Un planeta**.
+
+    B. Una estrella.
+
+    C. Una masa de gas.
+
+    D. Una lámpara lejana.
+    
+2. ¿Cómo es una estrella?
+    
+    A. Un punto.
+
+    B. Una línea.
+
+    C. gas estelar.
+
+    D. Una luciérnaga.
+

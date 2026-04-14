@@ -18,18 +18,18 @@ class AIMdFormatter:
         #self.model_path = model_path / "google_gemma_3n_E2B_it_Q4_K_M.gguf" #4B 2.6Gb
         
         #Una evaluación suele contenerse bien en 8192/2 tokens
-        self.max_tokens = 8192
+        self.max_tokens = 16384
 
         self.ia_model = Llama(
             model_path = str(self.model_path),
             top_p = 0.1,
-            top_k = 10,
-            temp = 0.0,
+            top_k = 50,
+            temp = 1.0,
             #chat_format = "chatml", #Qwen
             repeat_penalty = 1.15,
             n_threads=4,
             n_gpu_layers=0, #=6 4B 2.6Gb =0 5B 3.2Gb
-            n_batch = 128,
+            #n_batch = 128,
             n_ctx = self.max_tokens,
             #use_mlock = True,
             verbose = False)
@@ -65,24 +65,27 @@ class AIMdFormatter:
         
         self.set_model_prompt_setup(prompt)
 
+        '''
+        Se comprobó bajo nivel de precisión.
+        Se prueba un formato abierto.
         quiz_document_model = QuizDocumentModel.model_json_schema()
 
         quiz_output_format = {
             "type": "json_object",
             "schema": quiz_document_model
         }
-        
+        '''
         ai_response = self.ia_model.create_chat_completion(
             messages = self.messages,
-            response_format = quiz_output_format,
+            #response_format = quiz_output_format,
             max_tokens = int(self.max_tokens/2),
         )
 
         #self.write_debug_file(json.dumps(ai_response))
 
-        md_builder = MdBuilder(ai_response)
+        #md_builder = MdBuilder(ai_response)
         
-        return md_builder.generate_markdown()
+        return ai_response['choices'][0]['message']['content']
 
     def set_model_prompt_setup(self, prompt):
         system_prompt_path = self.model_path.parent / "md_handler" / "system_prompt.md"

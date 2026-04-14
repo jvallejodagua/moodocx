@@ -7,6 +7,7 @@ import threading
 import asyncio
 import sys
 from pathlib import Path
+import traceback
 from pandoc_handler.docx_to_md_converter import DocxToMdConverter
 from pandoc_handler.md_quiz_to_docx_converter import MdQuizToDocxConverter
 from latex_handler.latex_formulas_to_png_converter import LaTeXFormulasToPngConverter
@@ -309,6 +310,7 @@ class Moodocx:
                 await asyncio.to_thread(clase_instanciada.run) 
             except Exception as error:
                 self.texto_estado.value = f"Error en la ejecución: {error}"
+                traceback.print_exc()
                 self.texto_estado.color = ft.Colors.RED
                 self.btn_ejecutar.disabled = False
                 self.page.update()
