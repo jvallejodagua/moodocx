@@ -8,21 +8,20 @@ De acuerdo al texto responde:
 
 1. ¿Qué es el sol?
 
-    A. **Un planeta**.
+A. **Un planeta**.
 
-    B. Una estrella.
+B. Una estrella.
 
-    C. Una masa de gas.
+C. Una masa de gas.
 
-    D. Una lámpara lejana.
+D. Una lámpara lejana.
     
 2. ¿Cómo es una estrella?
-    
-    A. Un punto.
 
-    B. Una línea.
+A. Un punto.
 
-    C. gas estelar.
+B. Una línea.
 
-    D. Una luciérnaga.
+C. gas estelar.
 
+D. Una luciérnaga.
