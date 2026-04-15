@@ -12,10 +12,11 @@ class AIMdFormatter:
     def __init__(self, model_path):
 
         #self.model_path = model_path / "Qwen2.5_Coder_14B_Instruct_Q5_K_M.gguf"
-        self.model_path = model_path / "google_gemma_4_26B_A4B_it_Q4_K_M.gguf" #26B 15.9Gb
+        #self.model_path = model_path / "google_gemma_4_26B_A4B_it_Q4_K_M.gguf" #26B 15.9Gb
         #self.model_path = model_path / "google_gemma_4_E4B_it_Q5_K_M.gguf" #8B 5.4Gb
         #self.model_path = model_path / "google_gemma_4_E2B_it_Q4_K_M.gguf" #5B 3.2Gb
         #self.model_path = model_path / "google_gemma_3n_E2B_it_Q4_K_M.gguf" #4B 2.6Gb
+        self.model_path = model_path / "google_gemma_4_E4B_it_Q8_0.gguf" #8B 7.5Gb
 
         self.md_handler_path = self.model_path.parent / "md_handler"
 
@@ -124,21 +125,3 @@ class AIMdFormatter:
             # --- Fin del ejemplo ---
             {"role": "user", "content": prompt},
         ]
-
-    def write_debug_file(self, text):
-        output_file = Path("/home/johan/RepositoriosGithub/moodocx/Temporales/EvaluacionCopiada.json")
-        with open(output_file, 'w', encoding = 'utf-8') as f2:
-            f2.write(text)
-
-if __name__ == "__main__":
-    model_path = Path("/home/johan/RepositoriosGithub/moodocx")
-    ia_md_formatter = AIMdFormatter(model_path)
-    file = Path("/home/johan/RepositoriosGithub/moodocx/Temporales/EvaluacionCopiada.md")
-    with open(file, 'r', encoding='utf-8') as f:
-        content = f.read()
-    
-    text_md = ia_md_formatter.get_formatted_text_gemma(content)
-    
-    output_file = Path("/home/johan/RepositoriosGithub/moodocx/Temporales/EvaluacionCopiada-formateada.md")
-    with open(output_file, 'w', encoding = 'utf-8') as f2:
-        f2.write(text_md)
