@@ -10,25 +10,30 @@ import json
 class AIMdFormatter:
 
     def __init__(self, model_path):
-        
+
         #self.model_path = model_path / "Qwen2.5_Coder_14B_Instruct_Q5_K_M.gguf"
-        #self.model_path = model_path / "google_gemma_4_26B_A4B_it_Q4_K_M.gguf"
+        self.model_path = model_path / "google_gemma_4_26B_A4B_it_Q4_K_M.gguf" #26B 15.9Gb
         #self.model_path = model_path / "google_gemma_4_E4B_it_Q5_K_M.gguf" #8B 5.4Gb
-        self.model_path = model_path / "google_gemma_4_E2B_it_Q4_K_M.gguf" #5B 3.2Gb
+        #self.model_path = model_path / "google_gemma_4_E2B_it_Q4_K_M.gguf" #5B 3.2Gb
         #self.model_path = model_path / "google_gemma_3n_E2B_it_Q4_K_M.gguf" #4B 2.6Gb
-        
+
+        self.md_handler_path = self.model_path.parent / "md_handler"
+
         #Una evaluación suele contenerse bien en 8192/2 tokens
         self.max_tokens = 16384
 
+        #n_gpu_layers para nvidia gtx 1060 3Gb
         self.ia_model = Llama(
             model_path = str(self.model_path),
-            top_p = 0.1,
-            top_k = 50,
-            temp = 1.0,
+            seed = 13,
+            top_p = 0.8,
+            top_k = 40, #10 - 40
+            temp = 0.1,
             #chat_format = "chatml", #Qwen
-            repeat_penalty = 1.15,
+            repeat_penalty = 1.0,
             n_threads=4,
-            n_gpu_layers=0, #=6 4B 2.6Gb =0 5B 3.2Gb
+            n_gpu_layers=0, #=6 4B 2.6Gb =0 5B 3.2Gb =0 26B 15.9Gb
+            presence_penalty= 0.0,
             #n_batch = 128,
             n_ctx = self.max_tokens,
             #use_mlock = True,
@@ -88,24 +93,24 @@ class AIMdFormatter:
         return ai_response['choices'][0]['message']['content']
 
     def set_model_prompt_setup(self, prompt):
-        system_prompt_path = self.model_path.parent / "md_handler" / "system_prompt.md"
+        system_prompt_path = self.md_handler_path / "system_prompt.md"
         self.system_prompt = "Eres un asistente muy ayudador"
         with open(system_prompt_path, 'r', encoding='utf-8') as f:
             self.system_prompt = f.read()
 
-        content_example1_path = self.model_path.parent / "md_handler" / "example1.md"
+        content_example1_path = self.md_handler_path / "example1.md"
         with open(content_example1_path, 'r', encoding='utf-8') as f:
             self.content_example1 = f.read()
 
-        expected_output1_path = self.model_path.parent / "md_handler" / "expected_output1.md"
+        expected_output1_path = self.md_handler_path / "expected_output1.md"
         with open(expected_output1_path, 'r', encoding='utf-8') as f:
             self.expected_output1 = f.read()        
 
-        content_example2_path = self.model_path.parent / "md_handler" / "example2.md"
+        content_example2_path = self.md_handler_path / "example2.md"
         with open(content_example2_path, 'r', encoding='utf-8') as f:
             self.content_example2 = f.read()
 
-        expected_output2_path = self.model_path.parent / "md_handler" / "expected_output2.md"
+        expected_output2_path = self.md_handler_path / "expected_output2.md"
         with open(expected_output2_path, 'r', encoding='utf-8') as f:
             self.expected_output2 = f.read()        
 

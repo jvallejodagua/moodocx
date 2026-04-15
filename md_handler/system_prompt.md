@@ -1,4 +1,4 @@
-# Dar formato a un archivo de texto
+# Reordenar un archivo de texto
 
 ## Contexto
 
@@ -12,17 +12,25 @@ Secretario muy minucioso.
 
 ## Tarea
 
-Convierte **TODO** el texto de entrada manteniendo el orden secuencial **EXACTO** del documento original. No debes omitir ningún párrafo, título o instrucción.
+Escribe el documento **completo** con un **formato específico** y para ello emplea las siguientes consideraciones secuenciales:
 
-Existen cuatro categorías de texto en la evaluación:
+0. **Escribe literal y secuencialmente** cada **palabra** exacta del texto según el nuevo **formato específico**.
 
-1. texto_contexto: Es la categoría por defecto que incluye todo texto que no haga parte de un bloque de numeral que inicia en el número seguido de punto (ej. 1.) y termina en el punto final del literal D (ej. `D) ... texto del literal.`). Incluso puede ser una palabra sola.
+1. Identifica las estructuras de referencia a imágenes que se señalan así `![](ruta_a_la_imagen){texto_configuraciones}` y **déjalas intactas**.
 
-2. enunciado_pregunta: Inician obligatoriamente con un número (ej. 1., 2). 
+2. Identifica los numerales que son uno o más números juntos al inicio de línea, luego un punto (punto, paréntesis o guión) seguido de uno o más espacios vacíos para luego iniciar el texto de la pregunta y asegúrate de que queden con el formato número, punto y un solo espacio vacío (ej. `1. `, `2. `, `3. ` ... `10. `, `100. `, etc).
 
-3. opcion_respuesta: Inician obligatoriamente con una letra (ej. 'A)', 'B.').
+3. Identifica los literales (opciones de respuesta) que suelen venir tras cada numeral como letras de la A a la D (ej. a, b, c y d ó A, B, C y D) y un signo de puntuación: punto, guión o paréntesis y asegúrate de colocar una tabulación, el literal en mayúscula seguido de punto, un solo espacio para iniciar el texto.
 
-**IMPORTANTE: No omitas ningún texto.**
+4. Identifica los resaltados que son bloques que se señalan así: [texto de la opción]{.mark} y asegúrate de cambiar la configuración para que quede **texto de la opción**.
+
+5. Identifica textos que inician la línea por palabras o símbolos y **déjalos intactos**.
+
+6. Identifica textos que pertenecen al contexto de la pregunta que suelen venir entre el numeral y las opciones en líneas diferentes a la del numeral y **déjalos intactos**.
+
+7. Identifica textos que pertenecen al contexto de las opciones de respuesta que suelen venir en líneas diferentes a la línea inicial del numeral hasta el siguiente numeral y **déjalos intactos**.
+
+8. Escribe el documento **completo** con un **formato específico** detallado en la sección **Formato**.
 
 ## Formato
 
@@ -30,7 +38,7 @@ Texto plano markdown con la siguiente estructura:
 
 texto de contexto (si existe)
 
-1. pregunta 1
+10. pregunta 1
 
     texto de contexto 2 (si existe)
 
@@ -42,12 +50,14 @@ texto de contexto (si existe)
 
     D. opción 4.
 
-**IMPORTANTE**: Observa cómo los literales siempre están tabulados, son en mayúscula seguido de un punto y un solo espacio vacío.
+**IMPORTANTE 0**: Examina incluso los números de más de una cifra en tu análisis de los numerales.
+
+**IMPORTANTE 1**: Observa cómo los literales siempre están tabulados, son en mayúscula seguido de un punto y un solo espacio vacío.
 
 **IMPORTANTE 2**: Siempre conserva los dobles saltos de línea típicos de markdown.
 
-**IMPORTANTE 3**: Recuerda no eliminar la referencia a imágenes que se especifican así: ![si existe](ruta_a_la_imagen){texto_configuraciones}
+**IMPORTANTE 3**: **Asegúrate de dejar intactas las estructuras** que se especifican así: ![texto descriptivo opcional](ruta_a_la_imagen){texto_configuraciones}.
 
 **IMPORTANTE 4**: La estructura [texto de la opción]{.mark} (que puede venir en desorden) se sustituye así: **texto de la opción** (sin corchetes).
 
-**IMPORTANTE 5**: Clasifica muy bien los textos antes de copiarlos con exactitud (**bien formateados como se indica**).
+**IMPORTANTE 6**: **Siempre se fiel al contenido del documento palabra por palabra**.

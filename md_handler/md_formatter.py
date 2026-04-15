@@ -119,15 +119,15 @@ class MdFormatter:
     def get_formatted_markdown_text(self):
         self.numeral_counter = 0
         self.markdown_ai_format()
-        self.remove_code_blocks()
-        self.remove_comments_marks()
-        self.format_literals()
-        self.fix_numerals_sequence()
-        self.fix_soft_new_line()
-        self.remove_double_space()
-        self.tabulate_numeral_text()
-        self.fix_sigle_new_lines()
-        self.marks_to_bold()
+        # self.remove_code_blocks()
+        # self.remove_comments_marks()
+        # self.format_literals()
+        # self.fix_numerals_sequence()
+        # self.fix_soft_new_line()
+        # self.remove_double_space()
+        # self.tabulate_numeral_text()
+        # self.fix_sigle_new_lines()
+        # self.marks_to_bold()
         self.numeral_counter = 0
         
         return self.markdown_text
