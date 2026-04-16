@@ -38,7 +38,8 @@ class FilesAbstract:
             shutil.rmtree(self.compile_path)
     
     def copy_directory(self, from_path: Path, to_path: Path):
-        shutil.copytree(from_path, to_path, dirs_exist_ok=True)
+        if from_path.exists() and from_path.is_dir():
+            shutil.copytree(from_path, to_path, dirs_exist_ok=True)
 
 class FilesInSubfolder(FilesAbstract):
 

@@ -26,11 +26,11 @@ class SanitizerFormatter(FormatterAbstract):
 
     def remove_comments_marks(self):
         comment_mark_pattern = (
-            rf'^>(?:{self.space_character_but_new_line})?'
-            rf'(.*)({self.new_line})?'
+            rf'{self.comment_mark}({self.optional_space_but_new_line})'
+            rf'({self.to_end_chunk_multiline}$)'
         )
         comment_mark_regex = re.compile(comment_mark_pattern, re.MULTILINE)
-        self.apply_regex(comment_mark_regex, r'\1\2')
+        self.apply_regex(comment_mark_regex, r'\2')
 
     def remove_soft_new_lines(self):
         soft_new_line_pattern = rf'{self.soft_new_line}'
@@ -56,7 +56,7 @@ class SanitizerFormatter(FormatterAbstract):
         marks_pattern = (
             rf'({self.open_bracket})'
             rf'({self.any_literal})'
-            rf'({self.space_character_but_new_line}{self.multiline_dotall})'
+            rf'({self.space_but_new_line}{self.multiline_dotall})'
             rf'({self.close_bracket}{self.open_braces}'
             rf'{self.multiline_dotall}{self.closed_braces})'
         )
@@ -70,24 +70,24 @@ class SanitizerFormatter(FormatterAbstract):
     def expand_options_marks(self):
         colapsed_pattern = (
             rf'(^{self.any_literal}'
-            rf'{self.space_character_but_new_line}'
+            rf'{self.space_but_new_line}'
             rf'{self.open_bracket}{self.raw_chunk_multiline}'
             rf'{self.close_bracket}{self.open_braces}'
             rf'{self.raw_chunk_multiline}{self.closed_braces})'
             rf'({self.any_literal}'
-            rf'{self.space_character_but_new_line})'
+            rf'{self.space_but_new_line})'
         )
         colapsed_regex = re.compile(colapsed_pattern, re.MULTILINE)
-        self.apply_regex(colapsed_regex, r'\1\n\2')
+        self.apply_regex(colapsed_regex, rf'\1{self.simple_new_line}\2')
 
     def expand_options_general(self):
 
         expand_options_pattern = (
             rf'({self.any_literal}'
-            rf'{self.space_character_but_new_line}'
+            rf'{self.space_but_new_line}'
             rf'{self.raw_chunk_multiline})'
             rf'({self.any_literal}'
-            rf'{self.space_character_but_new_line}'
+            rf'{self.space_but_new_line}'
             rf'{self.raw_chunk_multiline})'
         )
 
@@ -101,12 +101,24 @@ class SanitizerFormatter(FormatterAbstract):
 
         single_literal_pattern = (
             rf'({self.closed_braces})({self.any_literal}'
-            rf'{self.space_character_but_new_line})'
+            rf'{self.space_but_new_line}'
+            rf'{self.one_line_dotall})'
         )
 
         single_literal_regex = re.compile(single_literal_pattern)
 
-        self.apply_regex(single_literal_regex, r'\1\n\n\2')
+        self.apply_regex(single_literal_regex, rf'\1{self.simple_new_line}\2')
+
+    def fix_literals(self):
+
+        compact_literal_pattern = (
+            rf'({self.any_literal})({self.optional_space_but_new_line})'
+            rf'({self.one_line_dotall})'
+        )
+
+        compact_literal_regex = re.compile(compact_literal_pattern)
+
+        self.apply_regex(compact_literal_regex, r'\1 \3')
 
     def sanitize_text(self):
         self.clear_empty_characters()
@@ -119,4 +131,7 @@ class SanitizerFormatter(FormatterAbstract):
         self.expand_options_general()
         self.expand_options_general()
         self.expand_single_literal()
+        self.expand_single_literal()
+        self.expand_single_literal()
+        self.fix_literals()
         return self.sanitized_text

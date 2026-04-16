@@ -13,6 +13,7 @@ import os
 from typing import List
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
+from pathlib import Path
 
 # --- Dependencias del proyecto ---
 from json_handler.docx_to_pydantic import DocxToPydantic, DocumentModel, QuestionModel

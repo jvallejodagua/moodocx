@@ -57,7 +57,7 @@ class TemplateCompiler(FormatterAbstract):
         for group_name in group_names:
             paragraph = self.groups[group_name]
             comment_mark_pattern = (
-                rf'^>(?:{self.space_character_but_new_line})?(.*)({self.new_line})?'
+                rf'^>(?:{self.space_but_new_line})?(.*)({self.new_line})?'
             )
             comment_mark_regex = re.compile(comment_mark_pattern, re.MULTILINE)
 

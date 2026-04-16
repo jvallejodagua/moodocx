@@ -21,15 +21,15 @@ class TemplateFormatter(FormatterAbstract):
 
     def build_multiline_pattern_list(self):
         for regex_id, pattern_value in self.multiline_pattern.items():
-            self.pattern_list.append(self.build_group_atomic_regex(regex_id, pattern_value))
+            self.pattern_list.append(self.build_group_simple_regex(regex_id, pattern_value))
 
     def build_singleline_option_pattern_list(self):
         for regex_id, pattern_value in self.singleline_option_pattern.items():
-            self.pattern_list.append(self.build_group_atomic_regex(regex_id, pattern_value))
+            self.pattern_list.append(self.build_group_simple_regex(regex_id, pattern_value))
 
     def build_regex(self):
         question_search_pattern = self.build_search_pattern(*self.pattern_list)
-        self.question_regex = self.build_group_atomic_regex(
+        self.question_regex = self.build_group_simple_regex(
             "question",
             rf'{question_search_pattern}',
         )
