@@ -22,18 +22,21 @@ class LaTeXFormulasToPngConverter:
     y pypdfium2, reemplazando el texto original por referencias a las imágenes.
     """
 
-    def __init__(self, target_directory: str, image_subfolder: str = "Imagenes"):
+    def __init__(self, inputs_path: Path):
         """
         Inicializa el procesador de ecuaciones.
 
         Args:
-            target_directory (str): Ruta del directorio que contiene los archivos .md.
+            inputs_path (str): Ruta del directorio que contiene los archivos .md.
             image_subfolder (str): Nombre de la subcarpeta donde se guardarán las imágenes generadas.
         """
-        self.target_dir = Path(target_directory)
-        self.target_dir = self.target_dir.absolute()
-        self.files_finder = FilesInSubfolder(self.target_dir,".md")
-        self.img_folder_name = image_subfolder
+        self.inputs_path = inputs_path
+        self.files_finder = FilesInSubfolder(
+            files_path = self.inputs_path,
+            suffix_extension = ".md"
+        )
+        self.images_prefix = self.files_finder.images_prefix
+        self.files_finder.create_compile_dir()
         
         # Configurar rutas de binarios según el sistema operativo
         if platform.system() == 'Windows':
@@ -74,8 +77,7 @@ class LaTeXFormulasToPngConverter:
         Escribe el código en un archivo temporal, lo compila con latexmk 
         y lo convierte a PNG usando pypdfium2.
         """
-        temp_dir = self.target_dir / "compilados"
-        temp_dir.mkdir(exist_ok=True)
+        temp_dir = self.files_finder.compile_path
         
         tex_file = temp_dir / "temp.tex"
         pdf_file = temp_dir / "temp.pdf"
@@ -157,9 +159,8 @@ class LaTeXFormulasToPngConverter:
         # Regex para capturar tanto ecuaciones inline ($...$) como en bloque ($$...$$)
         latex_pattern = re.compile(r'(\$\$?)(.+?)\1', re.DOTALL)
         
-        # Crear subcarpeta de imágenes para este archivo
-        img_dir_name = f"{self.img_folder_name}-{file_path.stem}"
-        img_dir_name=img_dir_name.replace(" ","")
+        no_space_stem = self.files_finder.make_no_space_stem(file_path)
+        img_dir_name = f"{self.images_prefix}-{no_space_stem}"
         img_dir = file_path.parent / img_dir_name
         img_dir.mkdir(exist_ok=True)
 
@@ -214,8 +215,10 @@ class LaTeXFormulasToPngConverter:
         
         print("Procesamiento de ecuaciones finalizado con éxito.")
 
+        self.files_finder.remove_compile_dir()
+
 
 # --- Bloque de Ejecución Principal ---
 if __name__ == "__main__":
-    procesador = LaTeXFormulasToPngConverter(target_directory="Temporales")
+    procesador = LaTeXFormulasToPngConverter(inputs_path="_Entradas")
     procesador.run()

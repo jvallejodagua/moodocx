@@ -29,10 +29,10 @@ class DocxToMdConverter:
     de Pandoc, y manejar los posibles errores durante el proceso.
     """
 
-    def __init__(self, source_directory: str):
+    def __init__(self, inputs_path: Path):
         
         self.files_finder = FilesInSubfolder(
-            route_to_subfolder = source_directory,
+            files_path = inputs_path,
             suffix_extension = ".docx",
         )
         
@@ -82,7 +82,7 @@ class DocxToMdConverter:
             
             print(f"\nProcesando: '{docx_file.name}' -> '{md_file.name}'")
 
-            stem_no_space = docx_file.stem.replace(" ","")
+            stem_no_space = self.files_finder.make_no_space_stem(docx_file)
             media_dir_path = f"Imagenes-{stem_no_space}"
             
             self.create_media_directory(media_dir_path)

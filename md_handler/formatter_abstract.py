@@ -8,6 +8,8 @@ class FormatterAbstract:
         self.numeral_character = r'\d+'
         self.space_character_but_new_line = r'[ \t\r\f\v]+'
         self.new_line = r'[\n]+'
+        self.optional_space = r'[ \t\r\f\v]*'
+        self.new_line_with_spaces = r'[\n]*[ \t\r\f\v]*'
         self.punctuation_separator = r'[\.\)]'
         self.accent_mark = r'[*]*'
         self.literal_A_character = r'[aA]'
@@ -19,10 +21,24 @@ class FormatterAbstract:
         self.worng_italic_mark = r'\*{3}'
         self.worng_bold_mark = r'\*{4}'
         self.comment_mark = r'^>'
+        self.escaped_underline = r'\\_'
+        self.open_bracket = r'\['
+        self.close_bracket = r'\]'
+        self.open_braces = r'\{'
+        self.closed_braces = r'\}'
         # Dotall
         self.one_line_dotall = r'[^\n]+'
+        self.multiline_dotall = r'.+?'
         # self.last_added_text = rf'.+?(?=\n{self.pandoc_comment_raw}\n)'
-        self.last_added_text = rf'.*?(?=\n{self.pandoc_comment_raw}\n)'
+        self.last_added_text = (
+            rf'.*?(?=\n{self.optional_space}{self.accent_mark}'
+            rf'{self.numeral_character}'
+            rf'{self.punctuation_separator}{self.accent_mark}'
+            rf'{self.space_character_but_new_line}{self.accent_mark}'
+            rf'{self.one_line_dotall}'
+            rf'|\Z)'
+        )
+
         self.pandoc_comment = rf'\n{self.pandoc_comment_raw}\n'
         self.end_document = r'\Z'
         
@@ -38,16 +54,27 @@ class FormatterAbstract:
         )
         self.windows_r_chars = r'\r'
         
+        # Compound regex
+        self.any_literal = (
+            rf'(?:{self.literal_A_character}|'
+            rf'{self.literal_B_character}|'
+            rf'{self.literal_C_character}|'
+            rf'{self.literal_D_character})'
+            rf'{self.punctuation_separator}'
+        )
+
         # Output regex
         self.output_punctuation = r'. '
         self.simple_new_line = r'\n'
         self.md_newline = r'\n\n'
         self.italic_mark = '*'
         self.bold_mark = '**'
+        self.underline = r'_'
         
         '''
         Regex dictionary keys
         '''
+        self.leading_space_key = "leading_space"
         self.accent_mark_numeral_key = "accent_mark_numeral"
         self.numeral_search_key = "numeral_search"
         self.accent_mark_post_numeral_key = "accent_mark_post_numeral"
@@ -151,6 +178,7 @@ class FormatterAbstract:
         '''
         # Multiline numerals regex
         self.multiline_pattern = {
+            self.leading_space_key : self.new_line_with_spaces,
             self.accent_mark_numeral_key : self.accent_mark,
             self.numeral_search_key : self.numeral_character,
             self.punctuation_numeral_key : self.punctuation_separator,
@@ -186,8 +214,8 @@ class FormatterAbstract:
             self.punctuation_separator_D_key : self.punctuation_separator,
             self.empty_space_D_key : self.space_character_but_new_line,
             self.option_D_key : self.one_line_dotall,
-            self.added_option_D_key : self.last_added_text,
-            self.pandoc_comment_key : self.pandoc_comment,
+            self.added_option_D_key : self.last_added_text
+            #self.pandoc_comment_key : self.pandoc_comment,
         }
 
         # Multiple line formatted question pattern
@@ -326,10 +354,10 @@ class FormatterAbstract:
 
     def get_interine_text(self, literal_match):
         return (
-            rf'.+?(?={self.new_line}'
+            rf'.+?(?={self.new_line}{self.optional_space}'
             rf'{literal_match}{self.punctuation_separator}'
             rf'{self.space_character_but_new_line}|'
-            rf'{self.new_line}'
+            rf'{self.new_line}{self.optional_space}'
             rf'{self.accent_mark}{literal_match}{self.punctuation_separator}'
             rf'{self.space_character_but_new_line})'
         )

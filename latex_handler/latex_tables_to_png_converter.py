@@ -15,15 +15,14 @@ import PIL
 from filesystem.files_finder import FilesInSubfolder, FilesChecker
 from filesystem.path_latex_windows import resolve_pdflatex_path
 
-class Compilador_Tablas:
+class TableCompiler:
         # 1. Al instanciar la clase, le pasas tus argumentos extra
-    def __init__(self, nombre_archivo_md, base_dir, eliminar_texto_ayuda):
-
-        self.files_finder = FilesChecker()
-        self.nombre_archivo = nombre_archivo_md.replace(" ", "")
-        self.base_dir=base_dir
+    def __init__(self, inputs_path, no_space_stem_name, delete_hint_flag):
+        self.files_finder = FilesChecker(inputs_path)
+        self.no_space_stem_name = no_space_stem_name
+        self.inputs_path=inputs_path
         self.contador_tablas = 1  # Llevamos la cuenta de cuántas tablas van
-        self.eliminar_texto_ayuda=eliminar_texto_ayuda
+        self.delete_hint_flag=delete_hint_flag
 
     def parse_markdown_table_to_latex(self, md_table_str):
         """Traduce una tabla Markdown a código LaTeX standalone usando tabularx."""
@@ -139,8 +138,9 @@ class Compilador_Tablas:
         texto_sufijo=coincidencia.group("texto_sufijo")
 
         # Crear subcarpeta de imágenes para este archivo
-        img_dir_name = f"Imagenes-{self.nombre_archivo}"
-        img_dir_path = self.base_dir / img_dir_name
+        img_dir_name = f"{self.files_finder.images_prefix}-{self.no_space_stem_name}"
+
+        img_dir_path = self.inputs_path / img_dir_name
         img_dir_path.mkdir(exist_ok=True)
 
         latex_code = self.parse_markdown_table_to_latex(tabla_markdown)
@@ -151,9 +151,8 @@ class Compilador_Tablas:
         img_filename = f"tabla_{self.contador_tablas}.png"
         final_img_path = img_dir_path / img_filename
         
-        temp_path = self.base_dir / "compilados"
-        temp_path.mkdir(exist_ok=True)
-
+        temp_path = self.files_finder.compile_path
+        
         tex_file = temp_path / "temp.tex"
         
         # 1. Escribir archivo .tex
@@ -229,7 +228,7 @@ class Compilador_Tablas:
                 shutil.copy(generated_png, final_img_path)
                 
                 # 5. Sustituir en el texto Markdown
-                if self.eliminar_texto_ayuda:
+                if self.delete_hint_flag:
                     md_image_ref = f"![]({img_dir_name}/{img_filename})"
                 else:
                     md_image_ref = f"![Tabla {self.contador_tablas}]({img_dir_name}/{img_filename})"
@@ -246,17 +245,19 @@ class Compilador_Tablas:
 
 class LaTeXTablesToPngConverter:
 
-    def __init__(self,  eliminar_texto_ayuda, target_dir):
-        self.eliminar_texto_ayuda=eliminar_texto_ayuda
+    def __init__(self, inputs_path, delete_hint_flag):
+        self.delete_hint_flag=delete_hint_flag
         self.files_finder = FilesInSubfolder(
-            route_to_subfolder = target_dir,
-            suffix_extension = ".md")
+            files_path = inputs_path,
+            suffix_extension = ".md"
+        )
+        self.files_finder.create_compile_dir()
 
-    def set_eliminar_texto_ayuda(self, nuevo_estado):
-        self.eliminar_texto_ayuda=nuevo_estado
+    def set_delete_hint_flag(self, nuevo_estado):
+        self.delete_hint_flag=nuevo_estado
 
     def run(self):
-        base_dir = self.files_finder.files_path
+        inputs_path = self.files_finder.files_path
         
         table_pattern = re.compile(
             r'^(?P<texto_adjunto>.*?)'                     # 1. Atrapa prefijos (como > o espacios)
@@ -274,20 +275,23 @@ class LaTeXTablesToPngConverter:
             with open(md_file, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            compilador = Compilador_Tablas(
-                nombre_archivo_md = md_file.stem,
-                base_dir = base_dir,
-                eliminar_texto_ayuda = self.eliminar_texto_ayuda)
+            no_space_stem_name = self.files_finder.make_no_space_stem(md_file)
+            table_compiler = TableCompiler(
+                inputs_path = inputs_path,
+                no_space_stem_name = no_space_stem_name,
+                delete_hint_flag = self.delete_hint_flag)
 
-            nuevo_contenido = re.sub(table_pattern, compilador, content)
+            nuevo_contenido = re.sub(table_pattern, table_compiler, content)
 
             # 6. Guardar cambios en el archivo MD
             with open(md_file, 'w', encoding='utf-8') as f:
                 f.write(nuevo_contenido)
                 
             print(f"Actualización completada para {md_file.name}\n")
+        
+        self.files_finder.remove_compile_dir()
 
 if __name__ == "__main__":
-    eliminar_texto_ayuda=True
-    processor = LaTeXTablesToPngConverter(eliminar_texto_ayuda)
+    delete_hint_flag=True
+    processor = LaTeXTablesToPngConverter(delete_hint_flag)
     processor.run()

@@ -71,13 +71,16 @@ class DocxToPydantic:
         self.numbering_definitions: Dict[str, Dict[str, Dict[str, str]]] = {}
         self.num_to_abstract_map: Dict[str, str] = {}
 
-    def parse_all(self, folder_path: str) -> List[DocumentModel]:
+    def parse_all(self, folder_path: Path) -> List[DocumentModel]:
         """
         Punto de entrada principal. Procesa todos los archivos .docx en la
         carpeta especificada.
         """
 
-        files_finder = FilesInSubfolder(folder_path, ".docx")
+        files_finder = FilesInSubfolder(
+            files_path = folder_path,
+            suffix_extension = ".docx"
+        )
         
         files = files_finder.get_files()
 

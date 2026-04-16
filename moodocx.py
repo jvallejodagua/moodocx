@@ -13,7 +13,7 @@ from pandoc_handler.md_quiz_to_docx_converter import MdQuizToDocxConverter
 from latex_handler.latex_formulas_to_png_converter import LaTeXFormulasToPngConverter
 from latex_handler.latex_tables_to_png_converter import LaTeXTablesToPngConverter
 from xml_handler.pydantic_to_moodle_xml_converter import PydanticToMoodleXmlConverter
-from md_handler.md_formatter_processor import SequenceFormatterProcessor
+from md_handler.md_formatter_processor import MdFormatterProcessor
 
 class Moodocx:
     """
@@ -42,19 +42,19 @@ class Moodocx:
 
         self.chk_tablas = ft.Checkbox(
             label = "Transformar tablas",
-            value = True,
+            value = False,
             label_style = self.estilo_texto,
         )
 
         self.chk_ecuaciones = ft.Checkbox(
             label = "Transformar ecuaciones",
-            value = True,
+            value = False,
             label_style = self.estilo_texto,
         )
         
         self.chk_markdown = ft.Checkbox(
             label = "Markdown a Docx (png)",
-            value = True,
+            value = False,
             label_style = self.estilo_texto,
         )
 
@@ -72,7 +72,7 @@ class Moodocx:
 
         self.chk_texto_ayuda = ft.Checkbox(
             label = "Quitar etiqueta de tablas",
-            value = True,
+            value = False,
             label_style = self.estilo_texto,
         )
 
@@ -108,31 +108,42 @@ class Moodocx:
         )
 
 
-        self.temporals_path = self.get_self_path() / "Temporales"
+        self.inputs_path = self.get_self_path() / "_Entradas"
+        self.inputs_path.mkdir(exist_ok=True)
+        self.outputs_path = self.get_self_path() / "_Salidas"
+        self.outputs_path.mkdir(exist_ok=True)
 
         self.actualizar_clases()
 
     def actualizar_clases(self):
         
-        self.procesador_word = DocxToMdConverter(source_directory = self.temporals_path)
+        self.procesador_word = DocxToMdConverter(
+            inputs_path = self.inputs_path
+        )
 
-        self.formateador_markdown = SequenceFormatterProcessor(source_directory = self.temporals_path)
+        self.formateador_markdown = MdFormatterProcessor(
+            inputs_path = self.inputs_path,
+            outputs_path = self.outputs_path,
+        )
 
         self.procesador_tablas = LaTeXTablesToPngConverter(
-            self.chk_texto_ayuda.value,
-            self.temporals_path)
+            inputs_path = self.outputs_path,
+            delete_hint_flag = self.chk_texto_ayuda.value,
+        )
         
-        self.procesador_ecuaciones = LaTeXFormulasToPngConverter(target_directory = self.temporals_path)
+        self.procesador_ecuaciones = LaTeXFormulasToPngConverter(
+            inputs_path = self.outputs_path
+        )
         
         self.generador_word = MdQuizToDocxConverter(
-            source_folder = self.temporals_path,
-            destination_folder = self.temporals_path,
+            inputs_path = self.outputs_path,
+            outputs_path = self.outputs_path,
             reuse_stimulus_input = self.chk_reutilizar_estimulo.value,
         )
 
         self.generador_moodle = PydanticToMoodleXmlConverter(
-            input_dir = self.temporals_path,
-            output_dir = self.temporals_path)
+            inputs_path = self.outputs_path,
+            outputs_path = self.outputs_path)
 
     def get_self_path(self):
 

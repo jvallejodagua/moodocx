@@ -1,4 +1,5 @@
-Temporales/
+_Entradas/
+_Salidas/
 pip.sh
 python3.sh
 activate.sh
@@ -9,3 +10,4 @@ moodocx.spec
 **.gguf
 log_arranque.txt
 docs_gemma
+system_prompt**

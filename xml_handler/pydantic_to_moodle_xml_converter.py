@@ -23,9 +23,9 @@ class PydanticToMoodleXmlConverter:
     en formato Moodle Quiz.
     """
 
-    def __init__(self, input_dir: str, output_dir: str):
-        self.input_directory = input_dir
-        self.output_directory = output_dir
+    def __init__(self, inputs_path: Path, outputs_path: Path):
+        self.inputs_path = inputs_path
+        self.outputs_path = outputs_path
 
     def _pretty_print_xml(self, root_element: ET.Element) -> str:
         """
@@ -155,7 +155,7 @@ class PydanticToMoodleXmlConverter:
         # --- Paso 1: Usar el parser existente para obtener los modelos Pydantic ---
         print("--- Paso 1: Parseando documentos DOCX a modelos Pydantic ---")
         parser = DocxToPydantic()
-        document_models = parser.parse_all(self.input_directory)
+        document_models = parser.parse_all(self.inputs_path)
 
         if not document_models:
             output_message="No se encontraron o no se pudieron procesar archivos DOCX.\n\nAsegúrese de que haya archivos .docx en la carpeta 'Temporales'."
@@ -166,10 +166,10 @@ class PydanticToMoodleXmlConverter:
             
             # --- Paso 2: Usar el nuevo conversor para generar el XML de Moodle ---
             print("\n--- Paso 2: Convirtiendo modelos Pydantic a Moodle XML ---")
-            self.process_and_save(document_models, self.output_directory)
+            self.process_and_save(document_models, self.outputs_path)
 
             print("\n--- Proceso de conversión completado. ---")
-            print(f"Puede encontrar los archivos XML en la carpeta '{self.output_directory}'.")
+            print(f"Puede encontrar los archivos XML en la carpeta '{self.outputs_path}'.")
 
 # --- Bloque de Ejecución Principal para Demostración ---
 if __name__ == "__main__":
@@ -177,5 +177,5 @@ if __name__ == "__main__":
     INPUT_FOLDER = "Temporales"
     OUTPUT_FOLDER = "Temporales" # Carpeta de salida para los XML
 
-    converter = PydanticToMoodleXmlConverter(input_dir=INPUT_FOLDER, output_dir=OUTPUT_FOLDER)
+    converter = PydanticToMoodleXmlConverter(inputs_path=INPUT_FOLDER, outputs_path=OUTPUT_FOLDER)
     converter.run()

@@ -291,21 +291,24 @@ class MdQuizToDocxConverter:
     """
 
     def __init__(self,
-        source_folder: Path = Path("Temporales"),
-        destination_folder: Path = Path("TemporalesTextoAVoz"),
+        inputs_path: Path = Path("Temporales"),
+        outputs_path: Path = Path("TemporalesTextoAVoz"),
         reuse_stimulus_input: bool = False):
         """
         Inicializa el restructurador.
 
         Args:
-            source_folder (str): El nombre de la carpeta que contiene los
+            inputs_path (str): El nombre de la carpeta que contiene los
                                  archivos .md a procesar. Se espera que
                                  esté al mismo nivel que el script.
         """
-        self.source_path = source_folder
-        self.destination_path = destination_folder
+        self.inputs_path = inputs_path
+        self.destination_path = outputs_path
         self.reuse_stimulus = reuse_stimulus_input
-        self.files_finder = FilesInSubfolder(self.source_path, ".md")
+        self.files_finder = FilesInSubfolder(
+            files_path = self.inputs_path,
+            suffix_extension = ".md"
+        )
 
     def reorder_doc(self, doc: pf.Doc) -> pf.Doc:
         '''
@@ -387,12 +390,12 @@ class MdQuizToDocxConverter:
         Ejecuta el proceso de reestructuración para todos los archivos .md
         en la carpeta de origen.
         """
-        if not self.source_path.is_dir():
-            print(f"El directorio de origen '{self.source_path}' no fue encontrado.")
+        if not self.inputs_path.is_dir():
+            print(f"El directorio de origen '{self.inputs_path}' no fue encontrado.")
             print("El script no procesará ningún archivo.")
             return
 
-        print(f"Iniciando proceso en la carpeta: '{self.source_path}'")
+        print(f"Iniciando proceso en la carpeta: '{self.inputs_path}'")
         markdown_files_found = False
 
         md_files = self.files_finder.get_files()
@@ -409,8 +412,8 @@ class MdQuizToDocxConverter:
                 str(md_file),
                 "-o", str(docx_file),
                 "--wrap=none",
-                #f"--resource-path=.{os.pathsep}{self.source_path}"]
-                f"--resource-path={self.source_path}"]
+                #f"--resource-path=.{os.pathsep}{self.inputs_path}"]
+                f"--resource-path={self.inputs_path}"]
             
             subprocess.run(
                 command,
@@ -442,8 +445,8 @@ class MdQuizToDocxConverter:
                     "-o",
                     str(docx_modified_file),
                     "--wrap=none",
-                    #f"--resource-path=:{self.source_path}"]
-                    f"--resource-path={self.source_path}"]
+                    #f"--resource-path=:{self.inputs_path}"]
+                    f"--resource-path={self.inputs_path}"]
 
                 subprocess.run(
                     command,
@@ -473,7 +476,7 @@ if __name__ == '__main__':
     
     try:
         
-        restructurer = MdQuizToDocxConverter(source_folder=FOLDER,destination_folder=FOLDER)
+        restructurer = MdQuizToDocxConverter(inputs_path=FOLDER,outputs_path=FOLDER)
         restructurer.run()
         
     except ImportError:
