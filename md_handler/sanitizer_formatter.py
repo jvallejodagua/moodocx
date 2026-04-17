@@ -67,6 +67,16 @@ class SanitizerFormatter(FormatterAbstract):
             self.sanitized_text
         )
 
+    def refactorize_marks(self):
+        diluted_mark_pattern = (
+            rf'({self.open_bracket}{self.one_line_dotall})'
+            rf'({self.new_line}{self.optional_space_but_new_line})'
+            rf'({self.close_bracket}'
+            rf'{self.open_braces}{self.one_line_dotall}{self.closed_braces})'
+        )
+        diluted_mark_regex = re.compile(diluted_mark_pattern, re.DOTALL)
+        self.apply_regex(diluted_mark_regex, r'\1\3')
+
     def expand_options_marks(self):
         colapsed_pattern = (
             rf'(^{self.any_literal}'
@@ -110,6 +120,14 @@ class SanitizerFormatter(FormatterAbstract):
 
         self.apply_regex(single_literal_regex, rf'\1{self.simple_new_line}\2')
 
+    def delete_code_blocks(self):
+        code_block_pattern = (
+            rf'{self.code_block_pattern}'
+        )
+
+        code_block_regex = re.compile(code_block_pattern)
+        self.apply_regex(code_block_regex, r'')
+
     def fix_literals(self):
 
         compact_literal_pattern = (
@@ -134,6 +152,7 @@ class SanitizerFormatter(FormatterAbstract):
         self.remove_soft_new_lines()
         self.remove_escaped_underline()
         self.apply_marks_to_options()
+        self.refactorize_marks()
         self.expand_options_marks()
         self.expand_options_general()
         self.expand_options_general()
@@ -141,6 +160,7 @@ class SanitizerFormatter(FormatterAbstract):
         self.expand_single_literal()
         self.expand_single_literal()
         self.expand_single_literal()
+        self.delete_code_blocks()
         self.fix_literals()
         self.fix_new_lines()
         return self.sanitized_text

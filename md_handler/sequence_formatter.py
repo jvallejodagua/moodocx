@@ -26,7 +26,7 @@ class SequenceFormatter(FormatterAbstract):
 
     def fix_numerals_sequence(self):
         numeral_pattern = (
-            rf'^({self.numeral_character}{self.output_punctuation})'
+            rf'^({self.numeral_character}{self.punctuation_separator})'
             rf'({self.to_end_chunk_multiline})'
         )
         numeral_regex = re.compile(numeral_pattern, re.MULTILINE)

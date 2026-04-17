@@ -57,20 +57,6 @@ class TemplateCompiler(FormatterAbstract):
             
             self.groups[group_name] = literal.upper()
 
-    def delete_code_blocks(self, *group_names):
-        for group_name in group_names:
-            paragraph = self.groups[group_name]
-            code_block_pattern = (
-                rf'{self.code_block_pattern}'
-            )
-            code_block_regex = re.compile(code_block_pattern, re.MULTILINE)
-
-            no_code_block_pattern = r''
-            self.groups[group_name] = code_block_regex.sub(
-                no_code_block_pattern,
-                paragraph
-            )
-
     def convert_marks_to_bold(self, *group_names):
         for group_name in group_names:
             paragraph = self.groups[group_name]
