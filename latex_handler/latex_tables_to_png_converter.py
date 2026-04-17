@@ -256,6 +256,10 @@ class LaTeXTablesToPngConverter:
         self.delete_hint_flag=nuevo_estado
 
     def run(self):
+        input_name = self.files_finder.files_path.stem
+        tag_text = f"Convirtiendo tablas latex a png en {input_name}"
+        tag = self.files_finder.get_process_tag(tag_text)
+        print(tag)
 
         inputs_path = self.files_finder.files_path
         

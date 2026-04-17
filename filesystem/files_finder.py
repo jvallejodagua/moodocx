@@ -122,7 +122,8 @@ class FilesManager(FilesAbstract):
                 to_path = media_output_folder
             )
     
-
+class SimpleLogger(FilesAbstract):
+    pass
 
 
 if __name__ == "__main__":

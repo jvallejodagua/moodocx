@@ -386,6 +386,9 @@ class MdQuizToDocxConverter:
             print(f" -> ERROR procesando el archivo {os.path.basename(file_path)}: {e}")
 
     def run(self):
+        tag_text = f"Convirtiendo md en {self.inputs_path.stem} a docx con pngs"
+        tag = self.files_finder.get_process_tag(tag_text)
+        print(tag)
         """
         Ejecuta el proceso de reestructuración para todos los archivos .md
         en la carpeta de origen.

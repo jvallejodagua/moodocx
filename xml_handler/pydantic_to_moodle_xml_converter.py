@@ -17,6 +17,7 @@ from pathlib import Path
 
 # --- Dependencias del proyecto ---
 from json_handler.docx_to_pydantic import DocxToPydantic, DocumentModel, QuestionModel
+from filesystem.files_finder import SimpleLogger
 
 class PydanticToMoodleXmlConverter:
     """
@@ -27,6 +28,7 @@ class PydanticToMoodleXmlConverter:
     def __init__(self, inputs_path: Path, outputs_path: Path):
         self.inputs_path = inputs_path
         self.outputs_path = outputs_path
+        self.files_finder = SimpleLogger()
 
     def _pretty_print_xml(self, root_element: ET.Element) -> str:
         """
@@ -152,9 +154,11 @@ class PydanticToMoodleXmlConverter:
                 print(output_messages[-1])
 
     def run(self):
-        
-        # --- Paso 1: Usar el parser existente para obtener los modelos Pydantic ---
-        print("--- Paso 1: Parseando documentos DOCX a modelos Pydantic ---")
+        tag_text = "Convirtiendo Docx a xml Moodle"
+        tag = self.files_finder.get_process_tag(tag_text)
+        print(tag)
+
+        print("--- Parseando documentos DOCX a modelos Pydantic ---")
         parser = DocxToPydantic()
         document_models = parser.parse_all(self.inputs_path)
 

@@ -202,7 +202,13 @@ class LaTeXFormulasToPngConverter:
             print("  [-] Sin cambios detectados.\n")
 
     def run(self):
+        input_name = self.files_finder.files_path.stem
+        tag_text = f"Convirtiendo fórmulas latex a png en {input_name}"
+        tag = self.files_finder.get_process_tag(tag_text)
+        print(tag)
         
+        inputs_path = self.files_finder.files_path
+      
         md_files = self.files_finder.get_files()
         
         if not md_files:

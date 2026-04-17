@@ -26,6 +26,12 @@ class MdFormatterProcessor:
         self.content = ""
         
     def run(self):
+        input_name = self.inputs_path.stem
+        output_name = self.outputs_path.stem
+        tag_text = f"Formateando md en {input_name} -> {output_name}"
+        tag = self.files_finder.get_process_tag(tag_text)
+        print(tag)
+
         self.markdown_files = self.files_finder.get_files()
 
         for file in self.markdown_files:
