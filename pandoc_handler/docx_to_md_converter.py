@@ -65,7 +65,9 @@ class DocxToMdConverter:
         """
         Orquesta el proceso de conversión para todos los archivos .docx encontrados.
         """
-        print("::: ------ Conversión de Docx a Markdown ------ :::")
+        tag_text = "Conversión de Docx a Markdown"
+        tag = self.files_finder.get_process_tag(tag_text)
+        print(tag)
         print(f"Directorio de trabajo: {self.files_finder.files_path}")
 
         docx_files_to_convert = self.files_finder.get_files()

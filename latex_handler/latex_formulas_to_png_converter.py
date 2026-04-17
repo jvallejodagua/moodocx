@@ -36,7 +36,6 @@ class LaTeXFormulasToPngConverter:
             suffix_extension = ".md"
         )
         self.images_prefix = self.files_finder.images_prefix
-        self.files_finder.create_compile_dir()
         
         # Configurar rutas de binarios según el sistema operativo
         if platform.system() == 'Windows':
@@ -214,9 +213,6 @@ class LaTeXFormulasToPngConverter:
             self.process_file(md_file)
         
         print("Procesamiento de ecuaciones finalizado con éxito.")
-
-        self.files_finder.remove_compile_dir()
-
 
 # --- Bloque de Ejecución Principal ---
 if __name__ == "__main__":

@@ -251,12 +251,12 @@ class LaTeXTablesToPngConverter:
             files_path = inputs_path,
             suffix_extension = ".md"
         )
-        self.files_finder.create_compile_dir()
 
     def set_delete_hint_flag(self, nuevo_estado):
         self.delete_hint_flag=nuevo_estado
 
     def run(self):
+
         inputs_path = self.files_finder.files_path
         
         table_pattern = re.compile(
@@ -288,8 +288,6 @@ class LaTeXTablesToPngConverter:
                 f.write(nuevo_contenido)
                 
             print(f"Actualización completada para {md_file.name}\n")
-        
-        self.files_finder.remove_compile_dir()
 
 if __name__ == "__main__":
     delete_hint_flag=True

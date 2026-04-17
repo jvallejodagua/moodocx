@@ -14,6 +14,7 @@ from latex_handler.latex_formulas_to_png_converter import LaTeXFormulasToPngConv
 from latex_handler.latex_tables_to_png_converter import LaTeXTablesToPngConverter
 from xml_handler.pydantic_to_moodle_xml_converter import PydanticToMoodleXmlConverter
 from md_handler.md_formatter_processor import MdFormatterProcessor
+from filesystem.files_finder import FilesManager
 
 class Moodocx:
     """
@@ -23,7 +24,7 @@ class Moodocx:
     """
     def __init__(self, page: ft.Page, width):
         self.page = page
-        self.page.title = "Moodocx V1.0.5"
+        self.page.title = "Moodocx V1.0.6"
         self.title_1 = "Moodocx"
         self.title_2 = "Transforma tus documentos"
         self.page.theme_mode = ft.ThemeMode.LIGHT
@@ -42,7 +43,7 @@ class Moodocx:
 
         self.chk_tablas = ft.Checkbox(
             label = "Transformar tablas",
-            value = False,
+            value = True,
             label_style = self.estilo_texto,
         )
 
@@ -107,12 +108,13 @@ class Moodocx:
             )
         )
 
-
         self.inputs_path = self.get_self_path() / "_Entradas"
         self.inputs_path.mkdir(exist_ok=True)
         self.outputs_path = self.get_self_path() / "_Salidas"
         self.outputs_path.mkdir(exist_ok=True)
-
+        self.files_finder = FilesManager(self.inputs_path, self.outputs_path)
+        self.files_finder.create_compile_dir()
+        
         self.actualizar_clases()
 
     def actualizar_clases(self):
@@ -266,11 +268,20 @@ class Moodocx:
         if self.chk_word.value:
             scripts_para_proceso.append(("Convirtiendo a markdown...", self.procesador_word))
 
+        se_debe_copiar = (
+            self.chk_tablas.value or
+            self.chk_ecuaciones.value or
+            self.chk_markdown.value
+        ) 
+
+        if se_debe_copiar:
+            scripts_para_proceso.append(("Copiando los markdown...", self.files_finder))
+
         if self.chk_formato_markdown.value:
             scripts_para_proceso.append(("Formateando los markdown...", self.formateador_markdown))
 
         if self.chk_tablas.value:
-            self.procesador_tablas.set_eliminar_texto_ayuda(self.chk_texto_ayuda.value)
+            self.procesador_tablas.set_delete_hint_flag(self.chk_texto_ayuda.value)
             scripts_para_proceso.append(("Transformando tablas...", self.procesador_tablas))
 
         if self.chk_ecuaciones.value:
