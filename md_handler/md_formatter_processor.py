@@ -42,9 +42,6 @@ class MdFormatterProcessor:
             self.sanitizer_formatter = SanitizerFormatter(self.content)
             self.content = self.sanitizer_formatter.sanitize_text()
             
-            # self.template_formatter = TemplateFormatter(self.content)
-            # self.content = self.template_formatter.reorder_singleline_quiz()
-            
             self.template_formatter = TemplateFormatter(self.content)
             self.content = self.template_formatter.format_multiline_quiz()
             

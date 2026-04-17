@@ -49,21 +49,14 @@ class TemplateFormatter(FormatterAbstract):
     '''
     Main Functions
     '''
-    def reorder_singleline_quiz(self):
-        self.build_single_line_pattern_list()
-        self.build_regex()
-        
-        question_pattern = re.compile(self.question_regex, re.MULTILINE)
-        quiz = question_pattern.sub(self.ouput_single_line_order, self.raw_text)
-        
-        return quiz
-
     def format_multiline_quiz(self):
         self.build_multiline_pattern_list()
         self.build_regex()
         
         question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
         
+        format_quiz = None
+
         upper_literals =  TemplateCompilerFunction(
             function_name = "upper_literals",
             args = [
@@ -71,17 +64,6 @@ class TemplateFormatter(FormatterAbstract):
                 self.literal_B_key,
                 self.literal_C_key,
                 self.literal_D_key
-            ]
-        )
-
-        delete_comment_marks = TemplateCompilerFunction(
-            function_name = "delete_comment_marks",
-            args = [
-                self.added_prompt_text_key,
-                self.added_option_A_key,
-                self.added_option_B_key,
-                self.added_option_C_key,
-                self.added_option_D_key
             ]
         )
 
@@ -125,7 +107,6 @@ class TemplateFormatter(FormatterAbstract):
             task_id = "format_quiz",
             functions = [
                 upper_literals,
-                delete_comment_marks,
                 delete_code_blocks,
                 convert_marks_to_bold,
                 tabulate_paragraphs
@@ -140,28 +121,28 @@ class TemplateFormatter(FormatterAbstract):
         quiz_formatted = question_pattern.sub(template_compiler, self.raw_text)
 
         # This is an odd edge case
-        # quiz_fixed_italic_marks = self.fix_single_aspect(
+        # quiz_formatted = self.fix_single_aspect(
         #     self.worng_italic_mark,
         #     self.italic_mark,
         #     quiz_formatted)
 
-        # quiz_fixed_bold_marks = self.fix_single_aspect(
+        # quiz_formatted = self.fix_single_aspect(
         #     self.worng_bold_mark,
         #     self.bold_mark,
         #     quiz_fixed_italic_marks)
 
-        quiz_fixed_soft_new_lines = self.fix_single_aspect(
-            self.soft_new_line,
-            self.simple_new_line,
-            quiz_formatted)
+        # quiz_formatted = self.fix_single_aspect(
+        #     self.soft_new_line,
+        #     self.simple_new_line,
+        #     quiz_formatted)
 
-        quiz_fixed_new_lines = self.fix_single_aspect(
-            self.new_line,
-            self.md_newline,
-            quiz_fixed_soft_new_lines)
+        # quiz_formatted = self.fix_single_aspect(
+        #     self.new_line,
+        #     self.md_newline,
+        #     quiz_fixed_soft_new_lines)
 
 
-        quiz = quiz_fixed_new_lines
+        quiz = quiz_formatted
 
         return quiz
     
@@ -180,13 +161,6 @@ class TemplateFormatter(FormatterAbstract):
             ]
         )
 
-        delete_comment_marks = TemplateCompilerFunction(
-            function_name = "delete_comment_marks",
-            args = [
-                self.added_prompt_text_key
-            ]
-        )
-
         delete_code_blocks = TemplateCompilerFunction(
             function_name = "delete_code_blocks",
             args = [
@@ -219,7 +193,6 @@ class TemplateFormatter(FormatterAbstract):
             task_id = "format_quiz",
             functions = [
                 upper_literals,
-                delete_comment_marks,
                 delete_code_blocks,
                 convert_marks_to_bold,
                 tabulate_paragraphs

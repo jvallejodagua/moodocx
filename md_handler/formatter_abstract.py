@@ -30,13 +30,14 @@ class FormatterAbstract:
         self.multiline_dotall = r'.+?'
         # self.last_added_text = rf'.+?(?=\n{self.pandoc_comment_raw}\n)'
         self.last_added_text = (
-            rf'{self.multiline_dotall}(?={self.accent_mark}'
+            rf'{self.multiline_dotall}(?=(?:{self.accent_mark}'
             rf'{self.numeral_character}'
             rf'{self.punctuation_separator}{self.accent_mark}'
             rf'{self.space_but_new_line}{self.accent_mark}'
-            rf'{self.one_line_dotall}'
+            rf'{self.one_line_dotall})'
             rf'|\Z)'
         )
+
         #rf'.*?(?=\n{self.optional_space_but_new_line}{self.accent_mark}'
 
         self.pandoc_comment = rf'\n{self.pandoc_comment_raw}\n'
@@ -108,66 +109,6 @@ class FormatterAbstract:
         self.added_option_D_key = "added_option_D"
         self.pandoc_comment_key = "pandoc_comment"
         
-        '''
-        Single line numerals Template
-        '''
-        # Single line numerals regex
-        self.single_line_pattern = {
-            self.accent_mark_numeral_key : self.accent_mark,
-            self.numeral_search_key : self.numeral_character,
-            self.accent_mark_post_numeral_key : self.accent_mark,
-            self.punctuation_numeral_key : self.punctuation_separator,
-            self.empty_space_numeral_key : self.space_but_new_line,
-            self.accent_prompt_key : self.accent_mark,
-            self.prompt_key : self.raw_chunk_multiline,
-            self.accent_mark_A_key : self.accent_mark,
-            self.literal_A_key : self.literal_A_character,
-            self.punctuation_separator_A_key : self.punctuation_separator,
-            self.empty_space_A_key : self.space_but_new_line,
-            self.option_A_key : self.raw_chunk_multiline,
-            self.accent_mark_B_key : self.accent_mark,
-            self.literal_B_key : self.literal_B_character,
-            self.punctuation_separator_B_key : self.punctuation_separator,
-            self.empty_space_B_key : self.space_but_new_line,
-            self.option_B_key : self.raw_chunk_multiline,
-            self.accent_mark_C_key : self.accent_mark,
-            self.literal_C_key : self.literal_C_character,
-            self.punctuation_separator_C_key : self.punctuation_separator,
-            self.empty_space_C_key : self.space_but_new_line,
-            self.option_C_key : self.raw_chunk_multiline,
-            self.accent_mark_D_key : self.accent_mark,
-            self.literal_D_key : self.literal_D_character,
-            self.punctuation_separator_D_key : self.punctuation_separator,
-            self.empty_space_D_key : self.space_but_new_line,
-            self.option_D_key : self.to_end_chunk_multiline
-        }
-        # Single line formatted question pattern
-        self.ouput_single_line_order = self.build_search_pattern(
-            rf'\g<{self.numeral_search_key}>',
-            self.output_punctuation,
-            rf'\g<{self.accent_mark_numeral_key}>',
-            rf'\g<{self.accent_mark_post_numeral_key}>',
-            rf'\g<{self.accent_prompt_key}>',
-            rf'\g<{self.prompt_key}>\n\n',
-            rf'\g<{self.literal_A_key}>',
-            self.output_punctuation,
-            rf'\g<{self.accent_mark_A_key}>',
-            rf'\g<{self.option_A_key}>\n\n',
-            rf'\g<{self.literal_B_key}>',
-            self.output_punctuation,
-            rf'\g<{self.accent_mark_B_key}>',
-            rf'\g<{self.option_B_key}>\n\n',
-            rf'\g<{self.literal_C_key}>',
-            self.output_punctuation,
-            rf'\g<{self.accent_mark_C_key}>',
-            rf'\g<{self.option_C_key}>\n\n',
-            rf'\g<{self.literal_D_key}>',
-            self.output_punctuation,
-            rf'\g<{self.accent_mark_D_key}>',
-            rf'\g<{self.option_D_key}>\n\n',
-            rf'{self.pandoc_comment_raw}',
-        )
-
         '''
         Multiline numerals
         '''

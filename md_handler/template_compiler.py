@@ -11,7 +11,11 @@ class TemplateCompiler(FormatterAbstract):
     '''
     Sección para inicializar variables y ejecutar de modo automático
     '''
-    def __init__(self, output_order: OrderList, transformations: TemplateCompilerTask):
+    def __init__(
+        self,
+        output_order: OrderList,
+        transformations: TemplateCompilerTask | None = None
+    ):
         super().__init__()
         self.output_order = output_order
         self.transformations = transformations
@@ -53,17 +57,6 @@ class TemplateCompiler(FormatterAbstract):
             
             self.groups[group_name] = literal.upper()
 
-    def delete_comment_marks(self, *group_names):
-        for group_name in group_names:
-            paragraph = self.groups[group_name]
-            comment_mark_pattern = (
-                rf'^>(?:{self.space_but_new_line})?(.*)({self.new_line})?'
-            )
-            comment_mark_regex = re.compile(comment_mark_pattern, re.MULTILINE)
-
-            no_comment_pattern = r'\1\2'
-            self.groups[group_name] = comment_mark_regex.sub(no_comment_pattern, paragraph)
-
     def delete_code_blocks(self, *group_names):
         for group_name in group_names:
             paragraph = self.groups[group_name]
@@ -73,7 +66,10 @@ class TemplateCompiler(FormatterAbstract):
             code_block_regex = re.compile(code_block_pattern, re.MULTILINE)
 
             no_code_block_pattern = r''
-            self.groups[group_name] = code_block_regex.sub(no_code_block_pattern, paragraph)
+            self.groups[group_name] = code_block_regex.sub(
+                no_code_block_pattern,
+                paragraph
+            )
 
     def convert_marks_to_bold(self, *group_names):
         for group_name in group_names:

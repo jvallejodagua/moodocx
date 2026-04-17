@@ -83,7 +83,8 @@ class SanitizerFormatter(FormatterAbstract):
     def expand_options_general(self):
 
         expand_options_pattern = (
-            rf'({self.any_literal}'
+            rf'((?:{self.any_literal}|' #literal or numeral
+            rf'(?:{self.numeral_character}{self.punctuation_separator}))'
             rf'{self.space_but_new_line}'
             rf'{self.raw_chunk_multiline})'
             rf'({self.any_literal}'
@@ -91,7 +92,7 @@ class SanitizerFormatter(FormatterAbstract):
             rf'{self.raw_chunk_multiline})'
         )
 
-        expand_options_regex = re.compile(expand_options_pattern, re.MULTILINE)
+        expand_options_regex = re.compile(expand_options_pattern, re.MULTILINE|re.VERBOSE)
         self.apply_regex(
             expand_options_regex,
             rf'\1{self.md_newline}\2'
@@ -120,6 +121,13 @@ class SanitizerFormatter(FormatterAbstract):
 
         self.apply_regex(compact_literal_regex, r'\1 \3')
 
+    def fix_new_lines(self):
+
+        new_line_pattern = rf'{self.new_line}'
+        new_line_regex = re.compile(new_line_pattern)
+        
+        self.apply_regex(new_line_regex, rf'{self.md_newline}')
+
     def sanitize_text(self):
         self.clear_empty_characters()
         self.remove_comments_marks()
@@ -134,4 +142,5 @@ class SanitizerFormatter(FormatterAbstract):
         self.expand_single_literal()
         self.expand_single_literal()
         self.fix_literals()
+        self.fix_new_lines()
         return self.sanitized_text
