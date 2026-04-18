@@ -45,7 +45,10 @@ class TemplateFormatter(FormatterAbstract):
         self.build_multiline_pattern_list()
         self.build_regex()
         
-        question_pattern = re.compile(self.question_regex, flags=re.DOTALL)
+        question_pattern = re.compile(
+            self.question_regex,
+            flags=re.DOTALL|re.MULTILINE
+        )
         
         format_quiz = None
 

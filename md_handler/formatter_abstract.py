@@ -28,13 +28,24 @@ class FormatterAbstract:
         # Dotall
         self.one_line_dotall = r'[^\n]+'
         self.multiline_dotall = r'.+?'
+        self.title_mark = r'^#{1,6}'
         # self.last_added_text = rf'.+?(?=\n{self.pandoc_comment_raw}\n)'
+        # self.last_added_text = (
+        #     rf'{self.multiline_dotall}(?=(?:{self.accent_mark}'
+        #     rf'{self.numeral_character}'
+        #     rf'{self.punctuation_separator}{self.accent_mark}'
+        #     rf'{self.space_but_new_line}{self.accent_mark}'
+        #     rf'{self.one_line_dotall})'
+        #     rf'|\Z)'
+        # )
         self.last_added_text = (
-            rf'{self.multiline_dotall}(?=(?:{self.accent_mark}'
+            rf'{self.multiline_dotall}(?=(?:(?:{self.accent_mark}'
             rf'{self.numeral_character}'
             rf'{self.punctuation_separator}{self.accent_mark}'
             rf'{self.space_but_new_line}{self.accent_mark}'
             rf'{self.one_line_dotall})'
+            rf'|'
+            rf'(?:{self.title_mark}{self.one_line_dotall}))'
             rf'|\Z)'
         )
 
@@ -60,12 +71,13 @@ class FormatterAbstract:
         )
 
         # Output regex
-        self.output_punctuation = r'. '
+        self.output_punctuation = r'.'
         self.simple_new_line = r'\n'
         self.md_newline = r'\n\n'
         self.italic_mark = '*'
         self.bold_mark = '**'
         self.underline = r'_'
+        self.simple_space = r' '
         
         '''
         Regex dictionary keys
@@ -182,6 +194,7 @@ class FormatterAbstract:
         self.output_multiline_list = [
             self.numeral_search_key,
             self.output_punctuation,
+            self.simple_space,
             self.accent_mark_numeral_key,
             self.accent_prompt_key,
             self.prompt_key,
@@ -190,24 +203,28 @@ class FormatterAbstract:
             self.new_line_A_key,
             self.literal_A_key,
             self.output_punctuation,
+            self.simple_space,
             self.accent_mark_A_key,
             self.option_A_key,
             self.added_option_A_key,
             self.new_line_B_key,
             self.literal_B_key,
             self.output_punctuation,
+            self.simple_space,
             self.accent_mark_B_key,
             self.option_B_key,
             self.added_option_B_key,
             self.new_line_C_key,
             self.literal_C_key,
             self.output_punctuation,
+            self.simple_space,
             self.accent_mark_C_key,
             self.option_C_key,
             self.added_option_C_key,
             self.new_line_D_key,
             self.literal_D_key,
             self.output_punctuation,
+            self.simple_space,
             self.accent_mark_D_key,
             self.option_D_key,
             self.added_option_D_key,

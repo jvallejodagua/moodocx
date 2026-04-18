@@ -2,6 +2,7 @@
 # latex_formulas_to_png_converter.py
 
 import os
+import sys
 import re
 import subprocess
 import tempfile
@@ -89,13 +90,20 @@ class LaTeXFormulasToPngConverter:
         # 2. Compilar con latexmk (Genera PDF)
         try:
             #print(self.pdflatex_path, '-pdf', '-interaction=nonstopmode', f'{base_name}.tex')
+
+            flags_creation = 0
+            if sys.platform == "win32":
+                flags_creation = subprocess.CREATE_NO_WINDOW
+
             subprocess.run(
                 [self.pdflatex_path, '-interaction=nonstopmode', '-halt-on-error', '-file-line-error', f'{base_name}.tex'],
                 cwd=str(temp_dir),
                 env=os.environ.copy(),
+                check=True,
                 capture_output=True,
                 text=True,
-                check=True
+                creationflags = flags_creation,
+                encoding = 'utf-8'
             )
         except subprocess.CalledProcessError as e:
             print(f"  [!] Error de compilación LaTeX:\n{e.stderr}")
@@ -206,7 +214,7 @@ class LaTeXFormulasToPngConverter:
         tag_text = f"Convirtiendo fórmulas latex a png en {input_name}"
         tag = self.files_finder.get_process_tag(tag_text)
         print(tag)
-        
+
         inputs_path = self.files_finder.files_path
       
         md_files = self.files_finder.get_files()

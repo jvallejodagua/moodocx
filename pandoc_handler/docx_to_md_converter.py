@@ -15,6 +15,7 @@ Requisitos:
 
 import subprocess
 import os
+import sys
 from pathlib import Path
 from typing import List
 from filesystem.files_finder import FilesInSubfolder
@@ -51,14 +52,19 @@ class DocxToMdConverter:
         ]
 
     def execute_pandoc_process(self, command: list[str]) -> None:
+        flags_creation = 0
+        if sys.platform == "win32":
+            flags_creation = subprocess.CREATE_NO_WINDOW
+        
         subprocess.run(
             command,
-            cwd=str(self.files_finder.files_path.absolute()),
-            env=os.environ.copy(),
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding='utf-8'
+            cwd = str(self.files_finder.files_path.absolute()),
+            env = os.environ.copy(),
+            check = True,
+            capture_output = True,
+            text = True,
+            creationflags = flags_creation,
+            encoding = 'utf-8'
         )
 
     def run(self) -> None:

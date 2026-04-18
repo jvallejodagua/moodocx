@@ -2,6 +2,7 @@
 # latex_tables_to_png_converter.py
 
 import os
+import sys
 import re
 import subprocess
 import tempfile
@@ -166,21 +167,22 @@ class TableCompiler:
                 pdflatex_path = resolve_pdflatex_path()
             else:
                 pdflatex_path = "/usr/local/texlive/2025/bin/x86_64-linux/pdflatex"
-            
+
+            flags_creation = 0
+            if sys.platform == "win32":
+                flags_creation = subprocess.CREATE_NO_WINDOW
+
             subprocess.run(
                 [pdflatex_path, '-interaction=nonstopmode', '-halt-on-error', '-file-line-error', 'temp.tex'],
                 cwd=f"{temp_path}",
                 env=os.environ.copy(),
+                check=True,
                 capture_output=True,
                 text=True,
-                encoding='utf-8',
-                check=True
+                creationflags = flags_creation,
+                encoding = 'utf-8'
             )
-            # subprocess.run(
-            #     ['latexmk', '-xelatex', '-interaction=nonstopmode', 'temp.tex'],
-            #     cwd=f"{temp_path}",
-            #     capture_output=True, text=True, check=True
-            # )
+
         except subprocess.CalledProcessError as e:
             print(f"  Error de LaTeX en la tabla {tabla_markdown}:")
             print(e.stdout) # Esto imprimirá el log de LaTeX

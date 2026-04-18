@@ -25,6 +25,7 @@ La lógica de transformación es la siguiente:
 """
 
 import os
+import sys
 import subprocess
 import panflute as pf
 from typing import List, Optional
@@ -417,6 +418,10 @@ class MdQuizToDocxConverter:
                 "--wrap=none",
                 #f"--resource-path=.{os.pathsep}{self.inputs_path}"]
                 f"--resource-path={self.inputs_path}"]
+
+            flags_creation = 0
+            if sys.platform == "win32":
+                flags_creation = subprocess.CREATE_NO_WINDOW
             
             subprocess.run(
                 command,
@@ -425,6 +430,7 @@ class MdQuizToDocxConverter:
                 check=True,
                 capture_output=True,
                 text=True,
+                creationflags = flags_creation,
                 encoding='utf-8'
             )
             
@@ -450,6 +456,10 @@ class MdQuizToDocxConverter:
                     "--wrap=none",
                     #f"--resource-path=:{self.inputs_path}"]
                     f"--resource-path={self.inputs_path}"]
+                
+                flags_creation = 0
+                if sys.platform == "win32":
+                    flags_creation = subprocess.CREATE_NO_WINDOW
 
                 subprocess.run(
                     command,
@@ -458,6 +468,7 @@ class MdQuizToDocxConverter:
                     check=True,
                     capture_output=True,
                     text=True,
+                    creationflags=flags_creation,
                     encoding='utf-8'
                 )
                 

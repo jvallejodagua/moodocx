@@ -49,13 +49,13 @@ class Moodocx:
 
         self.chk_ecuaciones = ft.Checkbox(
             label = "Transformar ecuaciones",
-            value = False,
+            value = True,
             label_style = self.estilo_texto,
         )
         
         self.chk_markdown = ft.Checkbox(
             label = "Markdown a Docx (png)",
-            value = False,
+            value = True,
             label_style = self.estilo_texto,
         )
 
@@ -73,7 +73,7 @@ class Moodocx:
 
         self.chk_texto_ayuda = ft.Checkbox(
             label = "Quitar etiqueta de tablas",
-            value = False,
+            value = True,
             label_style = self.estilo_texto,
         )
 
