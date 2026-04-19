@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# template_compiler_model.py
+
 from typing import Any, Dict, Tuple, List
 from pydantic import BaseModel, Field
 

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# template_formatter.py
+
 import re
 import sys
 from pathlib import Path

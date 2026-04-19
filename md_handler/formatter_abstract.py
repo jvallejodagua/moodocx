@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# formatter_abstract.py
+
 class FormatterAbstract:
 
     def __init__(self):
@@ -9,6 +12,7 @@ class FormatterAbstract:
         self.space_but_new_line = r'[^\S\n]+'
         self.optional_space_but_new_line = r'[^\S\n]*'
         self.new_line = r'[^\S \t\r\f\v]+'
+        self.excesive_new_line = r'[^\S \t\r\f\v]{3,}+'
         self.punctuation_separator = r'[\.\)]'
         self.accent_mark = r'[*]*'
         self.literal_A_character = r'\b[aA]\b'
@@ -25,6 +29,7 @@ class FormatterAbstract:
         self.close_bracket = r'\]'
         self.open_braces = r'\{'
         self.closed_braces = r'\}'
+        self.content_but_space = r'[^\s]+'
         # Dotall
         self.one_line_dotall = r'[^\n]+'
         self.multiline_dotall = r'.+?'

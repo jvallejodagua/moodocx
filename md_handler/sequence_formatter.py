@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# md_formatter.py
+# sequence_formatter.py
 
 import re
 from md_handler.formatter_abstract import FormatterAbstract

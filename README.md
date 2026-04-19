@@ -10,8 +10,14 @@ Se diseña en especial para las estructuras esquematizadas en esta sección (sin
 
 ### Lista de preguntas y respuestas
 
+Título del estímulo [nivel 1, 2, 3, ... 6] (opcional)
+
+Texto del estímulo (opcional)
+
 1. Estímulo de la pregunta.
+
     Imagen de la pregunta (si existe)
+
     Prompt de la tarea.
     
     A. opción 1.
@@ -22,21 +28,29 @@ Se diseña en especial para las estructuras esquematizadas en esta sección (sin
 
     D. opción 4.
 
+Título del estímulo [nivel 1, 2, 3, ... 6] (opcional)
+
+Texto del estímulo (opcional)
+
 2. Demás numerales.
 
 ### Estímulos compartidos y preguntas
 
-Estímulo 1.
+Título del estímulo 1 [nivel 1, 2, 3, ... 6] (opcional)
+
+Texto del estímulo 1 (opcional)
 
 1. Según el Estímulo 1 ...
 
 2. Según el Estímulo 1 ...
 
-Estímulo 2.
+Título del estímulo 2 [nivel 1, 2, 3, ... 6] (opcional)
+
+Texto del estímulo 2 (opcional)
 
 3. Según el Estímulo 2 ...
 
-4. Según el Estímulo 3 ...
+4. Según el Estímulo 2 ...
 
 ## Cómo instalar (ejecutable) o ejecutar (código fuente)
 
@@ -87,28 +101,36 @@ Descargue e instale siguiendo las instrucciones de la sección "tl;dr: Unix(ish)
 
 ### Ejecutable (Ver la sección de releases)
 
-Se ubica en un directorio que se desee para trabajar con la aplicación y se hace doble click (los usuarios linux deben asegurar el permiso de ejecución). Es importante no ubicar las versiones originales de los documentos en el directorio "Temporales" de la aplicación porque será modificado allí de forma irreversible. Una vez se esté a gusto con el resultado entonces se puede decidir cuál archivo conservar.
+Se ubica en un directorio que se desee para trabajar con la aplicación y se hace doble click (los usuarios linux deben asegurar el permiso de ejecución). Automáticamente el programa creará dos directorios "_Entradas" y "_Salidas".
+
+En la carpeta "_Entradas" se ubican los archivos de .docx o markdown que se quieran convertir. (El sistema automáticamente convierte docx a markdown y lo ubican en la misma carpeta de _Entradas). También se crea en "_Entradas" una carpeta para las imágenes contenidas originalmente en el archivo de .docx.
+
+En la carpeta "_Salidas" se ubican los archivos generados con el mismo nombre de los archivos originales pero que contienen las modificaciones que se desee aplicar en la interfaz gráfica de la aplicación.
 
 ## Cómo usarlo
 
-1. Los documentos docx ó markdown que se quieran convertir - transformar se deben colocar en la carpeta Temporales al interior del directorio del programa (En caso de borrarse dicha carpeta se puede crear o dejar que el sistema la cree).
+1. Los documentos docx ó markdown que se quieran convertir - transformar se deben colocar en la carpeta "_Entradas" al interior del directorio del programa (En caso de borrarse dicha carpeta se puede crear o dejar que el sistema la cree).
 
 Carpeta de Moodocx
 
 |___Moodocx.exe
 
-|___Temporales
+|___ _Entradas
+
+|___ _Salidas
 
 Carpeta de moodocx
 
 |___moodocx.py
 
-|___Temporales
+|___ _Entradas
+
+|___ _Salidas
 
 2. Seleccionar las opciones (Se recomienda no enviar directamente con la opción moodle para verificar previamente el docx que se procesará).
 
 3. Presionar el botón "Convertir".
 
-3. Una vez verificado el archivo se puede desmarcar todas las opciones y seleccionar la de convertir a moodle.
+3. Una vez verificado el archivo se puede desmarcar todas las opciones y seleccionar la opción de convertir a Moodle para que el archivo verificado sea convertido a xml Moodle.
 
-**Nota**: En caso de requerir *Generar reutilización del estímulo* se produce un archivo adicional que se rotula -modificado.docx para que el estímulo se adhiera a cada pregunta que sigue en el cuestionario hasta el siguiente texto de estímulo. En caso de requerir algunas preguntas sin reutilizar el estímulo y otras sí entonces es preciso hacer una mezcla manual de ambos archivos.
+**Nota**: En caso de requerir *Generar reutilización del estímulo* se produce un archivo adicional que se rotula -modificado.docx para que el estímulo se adhiera a cada pregunta que sigue en el cuestionario hasta el siguiente texto de estímulo. En caso de requerir algunas preguntas sin reutilizar el estímulo y otras sí entonces es preciso hacer una mezcla manual de ambos archivos antes de producir el xml de Moodle.

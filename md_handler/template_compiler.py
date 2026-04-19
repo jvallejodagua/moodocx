@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# template_compiler.py
+
 import re
 from typing import TypeAlias
 import time

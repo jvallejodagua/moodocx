@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# sanitizer_formatter.py
+
 import re
 from md_handler.formatter_abstract import FormatterAbstract
 
@@ -139,12 +142,28 @@ class SanitizerFormatter(FormatterAbstract):
 
         self.apply_regex(compact_literal_regex, r'\1 \3')
 
-    def fix_new_lines(self):
+    def fix_excesive_new_lines(self):
 
-        new_line_pattern = rf'{self.new_line}'
+        new_line_pattern = rf'{self.excesive_new_line}'
         new_line_regex = re.compile(new_line_pattern)
         
         self.apply_regex(new_line_regex, rf'{self.md_newline}')
+    
+    def fix_collapsed_options(self):
+
+        collapsed_option_pattern = (
+            rf'({self.content_but_space})'
+            rf'\n'
+            rf'({self.optional_space_but_new_line}'
+            rf'{self.any_literal} {self.one_line_dotall})'
+        )
+
+        collapsed_option_regex = re.compile(collapsed_option_pattern)
+        
+        self.apply_regex(
+            collapsed_option_regex,
+            rf'\1{self.md_newline}\2'
+            )
 
     def sanitize_text(self):
         self.clear_empty_characters()
@@ -162,5 +181,8 @@ class SanitizerFormatter(FormatterAbstract):
         self.expand_single_literal()
         self.delete_code_blocks()
         self.fix_literals()
-        self.fix_new_lines()
+        self.fix_excesive_new_lines()
+        self.fix_collapsed_options()
+        self.fix_collapsed_options()
+        self.fix_collapsed_options()
         return self.sanitized_text

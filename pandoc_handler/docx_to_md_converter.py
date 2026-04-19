@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# __PDWM__DocxToMdConverter_V0_0_5
+# docx_to_md_converter.py
 
 """
 Script para convertir archivos .docx a Markdown (.md) utilizando Pandoc.
