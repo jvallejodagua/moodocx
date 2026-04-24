@@ -30,31 +30,11 @@ class FormatterAbstract:
         self.open_braces = r'\{'
         self.closed_braces = r'\}'
         self.content_but_space = r'[^\s]+'
+        self.many_simple_spaces = r'[^\S\n\t\r\f\v]+'
         # Dotall
         self.one_line_dotall = r'[^\n]+'
         self.multiline_dotall = r'.+?'
         self.title_mark = r'^#{1,6}'
-        # self.last_added_text = rf'.+?(?=\n{self.pandoc_comment_raw}\n)'
-        # self.last_added_text = (
-        #     rf'{self.multiline_dotall}(?=(?:{self.accent_mark}'
-        #     rf'{self.numeral_character}'
-        #     rf'{self.punctuation_separator}{self.accent_mark}'
-        #     rf'{self.space_but_new_line}{self.accent_mark}'
-        #     rf'{self.one_line_dotall})'
-        #     rf'|\Z)'
-        # )
-        self.last_added_text = (
-            rf'{self.multiline_dotall}(?=(?:(?:{self.accent_mark}'
-            rf'{self.numeral_character}'
-            rf'{self.punctuation_separator}{self.accent_mark}'
-            rf'{self.space_but_new_line}{self.accent_mark}'
-            rf'{self.one_line_dotall})'
-            rf'|'
-            rf'(?:{self.title_mark}{self.one_line_dotall}))'
-            rf'|\Z)'
-        )
-
-        #rf'.*?(?=\n{self.optional_space_but_new_line}{self.accent_mark}'
 
         self.pandoc_comment = rf'\n{self.pandoc_comment_raw}\n'
         self.end_document = r'\Z'
@@ -75,6 +55,22 @@ class FormatterAbstract:
             rf'{self.punctuation_separator}'
         )
 
+        # regex compuestos
+        self.added_prompt_text = self.get_interine_text(self.literal_A_character)
+        self.added_option_A = self.get_interine_text(self.literal_B_character)
+        self.added_option_B = self.get_interine_text(self.literal_C_character)
+        self.added_option_C = self.get_interine_text(self.literal_D_character)
+        self.added_option_D = (
+            rf'{self.multiline_dotall}(?=(?:(?:{self.accent_mark}'
+            rf'{self.numeral_character}'
+            rf'{self.punctuation_separator}{self.accent_mark}'
+            rf'{self.space_but_new_line}{self.accent_mark}'
+            rf'{self.one_line_dotall})'
+            rf'|'
+            rf'(?:{self.title_mark}{self.one_line_dotall}))'
+            rf'|\Z)'
+        )
+
         # Output regex
         self.output_punctuation = r'.'
         self.simple_new_line = r'\n'
@@ -83,6 +79,7 @@ class FormatterAbstract:
         self.bold_mark = '**'
         self.underline = r'_'
         self.simple_space = r' '
+        self.numeral_example = "1."
         
         '''
         Regex dictionary keys
@@ -123,13 +120,43 @@ class FormatterAbstract:
         self.empty_space_D_key = "empty_space_D"
         self.option_D_key = "option_D"
         self.added_option_D_key = "added_option_D"
-        self.pandoc_comment_key = "pandoc_comment"
         
         '''
         Multiline numerals
         '''
-        # Multiline numerals regex
-        self.multiline_pattern = {
+        # Options pattern
+        self.options_pattern ={
+            self.new_line_A_key : self.new_line,
+            self.accent_mark_A_key : self.accent_mark,
+            self.literal_A_key : self.literal_A_character,
+            self.punctuation_separator_A_key : self.punctuation_separator,
+            self.empty_space_A_key : self.space_but_new_line,
+            self.option_A_key : self.one_line_dotall,
+            self.added_option_A_key : self.added_option_A,
+            self.new_line_B_key : self.new_line,
+            self.accent_mark_B_key : self.accent_mark,
+            self.literal_B_key : self.literal_B_character,
+            self.punctuation_separator_B_key : self.punctuation_separator,
+            self.empty_space_B_key : self.space_but_new_line,
+            self.option_B_key : self.one_line_dotall,
+            self.added_option_B_key : self.added_option_B,
+            self.new_line_C_key : self.new_line,
+            self.accent_mark_C_key : self.accent_mark,
+            self.literal_C_key : self.literal_C_character,
+            self.punctuation_separator_C_key : self.punctuation_separator,
+            self.empty_space_C_key : self.space_but_new_line,
+            self.option_C_key : self.one_line_dotall,
+            self.added_option_C_key : self.added_option_C,
+            self.new_line_D_key : self.new_line,
+            self.accent_mark_D_key : self.accent_mark,
+            self.literal_D_key : self.literal_D_character,
+            self.punctuation_separator_D_key : self.punctuation_separator,
+            self.empty_space_D_key : self.space_but_new_line,
+            self.option_D_key : self.one_line_dotall,
+            self.added_option_D_key : self.added_option_D
+        }
+
+        self.simple_numeral_pattern = {
             self.accent_mark_numeral_key : self.accent_mark,
             self.numeral_search_key : self.numeral_character,
             self.punctuation_numeral_key : self.punctuation_separator,
@@ -137,63 +164,39 @@ class FormatterAbstract:
             self.empty_space_numeral_key : self.space_but_new_line,
             self.accent_prompt_key : self.accent_mark,
             self.prompt_key : self.one_line_dotall,
-            self.added_prompt_text_key : self.get_interine_text(self.literal_A_character),
-            self.new_line_A_key : self.new_line,
-            self.accent_mark_A_key : self.accent_mark,
-            self.literal_A_key : self.literal_A_character,
-            self.punctuation_separator_A_key : self.punctuation_separator,
-            self.empty_space_A_key : self.space_but_new_line,
-            self.option_A_key : self.one_line_dotall,
-            self.added_option_A_key : self.get_interine_text(self.literal_B_character),
-            self.new_line_B_key : self.new_line,
-            self.accent_mark_B_key : self.accent_mark,
-            self.literal_B_key : self.literal_B_character,
-            self.punctuation_separator_B_key : self.punctuation_separator,
-            self.empty_space_B_key : self.space_but_new_line,
-            self.option_B_key : self.one_line_dotall,
-            self.added_option_B_key : self.get_interine_text(self.literal_C_character),
-            self.new_line_C_key : self.new_line,
-            self.accent_mark_C_key : self.accent_mark,
-            self.literal_C_key : self.literal_C_character,
-            self.punctuation_separator_C_key : self.punctuation_separator,
-            self.empty_space_C_key : self.space_but_new_line,
-            self.option_C_key : self.one_line_dotall,
-            self.added_option_C_key : self.get_interine_text(self.literal_D_character),
-            self.new_line_D_key : self.new_line,
-            self.accent_mark_D_key : self.accent_mark,
-            self.literal_D_key : self.literal_D_character,
-            self.punctuation_separator_D_key : self.punctuation_separator,
-            self.empty_space_D_key : self.space_but_new_line,
-            self.option_D_key : self.one_line_dotall,
-            self.added_option_D_key : self.last_added_text
-            #self.pandoc_comment_key : self.pandoc_comment,
         }
 
-        # Multiple line formatted question pattern
-        self.ouput_multiline_order = self.build_search_pattern(
-            # rf'\g<{self.numeral_search_key}>',
-            # self.output_punctuation,
-            # rf'\g<{self.accent_prompt_key}>',
-            # rf'\g<{self.prompt_key}>',
-            # rf'\g<{self.added_prompt_text_key}>',
-            # rf'\g<{self.literal_A_key}>',
-            # self.output_punctuation,
-            # rf'\g<{self.accent_mark_A_key}>',
-            # rf'\g<{self.option_A_key}>',
-            # rf'\g<{self.added_option_A_key}>'
-            # rf'\g<{self.literal_B_key}>',
-            # self.output_punctuation,
-            # rf'\g<{self.accent_mark_B_key}>',
-            # rf'\g<{self.option_B_key}>',
-            # rf'\g<{self.literal_C_key}>',
-            # self.output_punctuation,
-            # rf'\g<{self.accent_mark_C_key}>',
-            # rf'\g<{self.option_C_key}>',
-            # rf'\g<{self.literal_D_key}>',
-            # self.output_punctuation,
-            # rf'\g<{self.accent_mark_D_key}>',
-            # rf'\g<{self.option_D_key}>',
-            # rf'\g<{self.pandoc_comment_key}>',
+        self.added_text_numeral_pattern = {
+            self.added_prompt_text_key : self.added_prompt_text
+        }
+
+        self.regular_numerals_pattern = (
+            self.simple_numeral_pattern |
+            self.added_text_numeral_pattern
+        )
+
+        # Multiline numerals pattern
+        self.multiline_pattern = (
+            self.regular_numerals_pattern |
+            self.options_pattern
+        )
+
+        self.headings_pattern = {
+            self.numeral_search_key : self.title_mark,
+            self.empty_space_numeral_key : self.space_but_new_line,
+            self.accent_prompt_key : self.accent_mark,
+            self.prompt_key : self.one_line_dotall
+        }
+
+        self.headings_replacing_numerals_pattern = {
+            self.added_prompt_text_key : self.added_prompt_text
+        }
+
+        #Headings but numeral pattern
+        self.headings_but_numerals_pattern = (
+            self.headings_pattern |
+            self.headings_replacing_numerals_pattern |
+            self.options_pattern
         )
 
         self.output_multiline_list = [
@@ -233,9 +236,12 @@ class FormatterAbstract:
             self.accent_mark_D_key,
             self.option_D_key,
             self.added_option_D_key,
-            # self.pandoc_comment_key
         ]
 
+        self.pattern_list = []
+        self.working_regex = None
+
+    # Funciones auxiliares
     def build_search_pattern(self, *args):
         search_pattern=""
         for arg in args:
@@ -254,3 +260,18 @@ class FormatterAbstract:
 
     def build_group_simple_regex(self, pattern_name, search_pattern):
         return rf'(?P<{pattern_name}>{search_pattern})'
+
+    # Conectores a las posibles entradas
+    def build_pattern_list(self, pattern_dict: dict):
+        self.pattern_list = []
+        for regex_id, pattern_value in pattern_dict.items():
+            self.pattern_list.append(
+                self.build_group_simple_regex(regex_id, pattern_value)
+            )
+
+    def build_regex(self):
+        question_search_pattern = self.build_search_pattern(*self.pattern_list)
+        self.working_regex = self.build_group_simple_regex(
+            "question",
+            rf'{question_search_pattern}',
+        )

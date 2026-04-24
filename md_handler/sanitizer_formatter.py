@@ -26,6 +26,17 @@ class SanitizerFormatter(FormatterAbstract):
         empty_characters_regex = re.compile(empty_characters_pattern)
         self.apply_regex(empty_characters_regex, r'')
 
+    def remove_new_line_empty_space(self):
+        new_line_empty_space_pattern = (
+            rf'^{self.many_simple_spaces}({self.one_line_dotall})'
+        )
+
+        new_line_empty_space_regex = re.compile(
+            new_line_empty_space_pattern,
+            re.MULTILINE
+        )
+
+        self.apply_regex(new_line_empty_space_regex, r'\1')
 
     def remove_comments_marks(self):
         comment_mark_pattern = (
@@ -165,8 +176,58 @@ class SanitizerFormatter(FormatterAbstract):
             rf'\1{self.md_newline}\2'
             )
 
+    def replace_if_not_interine_numeral(self, match):
+        data = match.groupdict()
+        interine_text = data.get(self.added_prompt_text_key)
+        self.build_pattern_list(self.simple_numeral_pattern)
+        self.build_regex()
+        numeral_regex = re.compile(
+            self.working_regex,
+            re.MULTILINE
+        )
+
+        not_replace = numeral_regex.search(interine_text)
+        original_text = match.group(0)
+
+        if not_replace:
+            return original_text
+        
+        target_key = self.numeral_search_key
+        new_value = self.numeral_example
+
+        modified_text = original_text
+
+        if target_key in data and data[target_key] is not None:
+
+            initial_group = match.start(target_key) - match.start(0)
+            end_group = match.end(target_key) - match.start(0)
+
+            modified_text = (
+                original_text[:initial_group] +
+                new_value +
+                original_text[end_group:]
+            )
+        
+        return modified_text
+
+    def fix_wrong_headings_replacing_numerals(self):
+        self.build_pattern_list(self.headings_but_numerals_pattern)
+        self.build_regex()
+        
+        question_regex = re.compile(
+            self.working_regex,
+            flags=re.DOTALL|re.MULTILINE
+        )
+
+        self.sanitized_text = re.sub(
+            question_regex,
+            self.replace_if_not_interine_numeral,
+            self.sanitized_text
+        )
+
     def sanitize_text(self):
         self.clear_empty_characters()
+        self.remove_new_line_empty_space()
         self.remove_comments_marks()
         self.remove_soft_new_lines()
         self.remove_escaped_underline()
@@ -185,4 +246,5 @@ class SanitizerFormatter(FormatterAbstract):
         self.fix_collapsed_options()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
+        self.fix_wrong_headings_replacing_numerals()
         return self.sanitized_text

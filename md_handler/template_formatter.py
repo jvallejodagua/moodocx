@@ -14,20 +14,6 @@ class TemplateFormatter(FormatterAbstract):
     def __init__(self, content):
         super().__init__()
         self.raw_text = content
-        self.pattern_list = []
-        self.question_regex = None
-
-    # Conectores a las posibles entradas
-    def build_multiline_pattern_list(self):
-        for regex_id, pattern_value in self.multiline_pattern.items():
-            self.pattern_list.append(self.build_group_simple_regex(regex_id, pattern_value))
-
-    def build_regex(self):
-        question_search_pattern = self.build_search_pattern(*self.pattern_list)
-        self.question_regex = self.build_group_simple_regex(
-            "question",
-            rf'{question_search_pattern}',
-        )
 
     '''
     Auxiliary Functions
@@ -45,11 +31,11 @@ class TemplateFormatter(FormatterAbstract):
     Main Functions
     '''
     def format_multiline_quiz(self):
-        self.build_multiline_pattern_list()
+        self.build_pattern_list(self.multiline_pattern)
         self.build_regex()
         
         question_pattern = re.compile(
-            self.question_regex,
+            self.working_regex,
             flags=re.DOTALL|re.MULTILINE
         )
         
@@ -136,10 +122,10 @@ class TemplateFormatter(FormatterAbstract):
     Test functions
     '''
     def test_multiple_line_numerals(self):
-        self.build_multiline_pattern_list()
+        self.build_pattern_list(self.multiline_pattern)
         self.build_regex()
         
-        question_pattern = re.compile(self.question_regex, re.DOTALL)
+        question_pattern = re.compile(self.working_regex, re.DOTALL)
         quiz = question_pattern.sub(self.ouput_multiline_order, self.raw_text)
         
         return quiz
