@@ -4,6 +4,7 @@
 from pathlib import Path
 import shutil
 import time
+import sys
 
 class FilesAbstract:
 
@@ -15,6 +16,23 @@ class FilesAbstract:
         self.images_prefix = "Imagenes"
         self.compile_dir_name = "__compile_workshop"
         self.files = []
+    
+    def resolve_user_folder_path(self, relative_path: str | Path):
+
+        if getattr(sys, 'frozen', False):
+            self_path = Path(sys.executable).resolve().parent.absolute()
+        else:
+            self_path = Path(__file__).resolve().parent.parent.absolute()
+            
+        return self_path / relative_path
+
+    def resolve_internal_path(self, relative_path: str | Path):
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            base_path = Path(sys._MEIPASS)
+        else:
+            base_path = Path(__file__).resolve().parent.parent
+
+        return base_path / relative_path
 
     def file_exists(self, file_path, time_out_s=600):
         init_time = time.time()

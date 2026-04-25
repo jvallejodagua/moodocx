@@ -14,6 +14,7 @@ Requisitos:
 """
 
 import subprocess
+import tempfile
 import os
 import sys
 from pathlib import Path
@@ -41,10 +42,16 @@ class DocxToMdConverter:
         media_folder_path = self.files_finder.files_path / media_folder
         media_folder_path.mkdir(exist_ok=True)
 
-    def build_pandoc_command(self, input_file: str, output_file: str, media_folder: str) -> list[str]:
+    def build_pandoc_command(self, input_file: str, output_file: str, media_folder: str, filter_path: str) -> list[str]:
         return[
             "pandoc",
             input_file,
+            '--lua-filter',
+            filter_path,
+            '-t',
+            # 'gfm',
+            # 'markdown-grid_tables-multiline_tables+pipe_tables',
+            'markdown-grid_tables-multiline_tables-simple_tables',
             "-o",
             output_file,
             f"--extract-media={media_folder}",
@@ -95,10 +102,17 @@ class DocxToMdConverter:
             
             self.create_media_directory(media_dir_path)
             
+            lua_filter_path = self.files_finder.resolve_internal_path("pandoc_handler/flatten_tables.lua")
+
+            # Buena práctica: Verificar que el archivo realmente existe antes de llamar a Pandoc
+            if not lua_filter_path.exists():
+                raise FileNotFoundError(f"¡Error Crítico! No se encontró el filtro Lua en: {lua_filter_path}")
+
             command = self.build_pandoc_command(
                 docx_file,
                 md_file,
-                media_dir_path)
+                media_dir_path,
+                lua_filter_path)
 
             try:
                 result = self.execute_pandoc_process(command)
@@ -116,7 +130,7 @@ class DocxToMdConverter:
                 print(f"  -> ERROR: Falló la conversión de '{docx_file.name}'.")
                 print(f"     Salida de error de Pandoc: {e.stderr.strip()}")
                 error_count += 1
-        
+            
         print("\n--- Resumen de la conversión ---")
         print(f"Archivos convertidos con éxito: {success_count}")
         print(f"Archivos con errores: {error_count}")

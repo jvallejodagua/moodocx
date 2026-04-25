@@ -14,7 +14,7 @@ from latex_handler.latex_formulas_to_png_converter import LaTeXFormulasToPngConv
 from latex_handler.latex_tables_to_png_converter import LaTeXTablesToPngConverter
 from xml_handler.pydantic_to_moodle_xml_converter import PydanticToMoodleXmlConverter
 from md_handler.md_formatter_processor import MdFormatterProcessor
-from filesystem.files_finder import FilesManager
+from filesystem.files_finder import FilesManager, SimpleLogger
 
 class Moodocx:
     """
@@ -107,10 +107,11 @@ class Moodocx:
                 padding = 30
             )
         )
-
-        self.inputs_path = self.get_self_path() / "_Entradas"
+        
+        self.files_checker = SimpleLogger()
+        self.inputs_path = self.files_checker.resolve_user_folder_path("_Entradas")
         self.inputs_path.mkdir(exist_ok=True)
-        self.outputs_path = self.get_self_path() / "_Salidas"
+        self.outputs_path = self.files_checker.resolve_user_folder_path("_Salidas")
         self.outputs_path.mkdir(exist_ok=True)
         self.files_finder = FilesManager(self.inputs_path, self.outputs_path)
         self.files_finder.create_compile_dir()
@@ -146,15 +147,6 @@ class Moodocx:
         self.generador_moodle = PydanticToMoodleXmlConverter(
             inputs_path = self.outputs_path,
             outputs_path = self.outputs_path)
-
-    def get_self_path(self):
-
-        if getattr(sys, 'frozen', False):
-            self_path = Path(sys.executable).resolve().parent.absolute()
-        else:
-            self_path = Path(__file__).resolve().parent.absolute()
-            
-        return self_path
 
     def obtener_vista(self):
         """
