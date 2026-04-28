@@ -8,6 +8,7 @@ from md_handler.sequence_formatter import SequenceFormatter
 from md_handler.template_formatter import TemplateFormatter
 from md_handler.template_formatter import FormatterAbstract
 from md_handler.sanitizer_formatter import SanitizerFormatter
+from md_handler.ai_md_formatter import AIMdFormatter
 from filesystem.files_finder import FilesInSubfolder
 
 class MdFormatterProcessor:
@@ -15,6 +16,7 @@ class MdFormatterProcessor:
     def __init__(self, inputs_path: Path, outputs_path: Path):
         self.formatter_abstract = FormatterAbstract()
         self.sanitizer_formatter = None
+        self.ai_md_formatter = None
         self.template_formatter = None
         self.sequence_formatter = None
         self.files_finder = FilesInSubfolder(
@@ -45,9 +47,12 @@ class MdFormatterProcessor:
             #new_content = self.template_formatter.get_formatted_markdown_text()
             self.content = self.add_optative_pandoc_comment(self.content)
             
-            self.sanitizer_formatter = SanitizerFormatter(self.content)
-            self.content = self.sanitizer_formatter.sanitize_text()
+            #self.sanitizer_formatter = SanitizerFormatter(self.content)
+            #self.content = self.sanitizer_formatter.sanitize_text()
             
+            self.ai_md_formatter = AIMdFormatter(self.content)
+            self.content = self.ai_md_formatter.get_formatted_text_ai()
+
             self.template_formatter = TemplateFormatter(self.content)
             self.content = self.template_formatter.format_multiline_quiz()
             
