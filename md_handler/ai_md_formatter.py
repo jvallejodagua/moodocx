@@ -16,7 +16,9 @@ class AIMdFormatter:
         #self.model_path = model_path / "google_gemma_4_E4B_it_Q5_K_M.gguf" #8B 5.4Gb
         #self.model_path = model_path / "google_gemma_4_E2B_it_Q4_K_M.gguf" #5B 3.2Gb
         #self.model_path = model_path / "google_gemma_3n_E2B_it_Q4_K_M.gguf" #4B 2.6Gb
-        self.model_path = model_path / "google_gemma_4_E4B_it_Q8_0.gguf" #8B 7.5Gb
+        #self.model_path = model_path / "google_gemma_4_E4B_it_Q8_0.gguf" #8B 7.5Gb
+        self.model_path = model_path / "Agente_GPT_Qwen_2.5_7B_Spanish_16bit.Q4_K_M.gguf"
+
 
         self.md_handler_path = self.model_path.parent / "md_handler"
 
@@ -30,7 +32,7 @@ class AIMdFormatter:
             top_p = 0.8,
             top_k = 40, #10 - 40
             temp = 0.1,
-            #chat_format = "chatml", #Qwen
+            chat_format = "chatml", #Qwen
             repeat_penalty = 1.0,
             n_threads=4,
             n_gpu_layers=0, #=6 4B 2.6Gb =0 5B 3.2Gb =0 26B 15.9Gb
