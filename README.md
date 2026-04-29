@@ -58,6 +58,12 @@ Existen algunos prerrequisitos clave para la instalación ó ejecución exitosa 
 
 ### Instalación y Ejecución
 
+Descargue el archivo de la IA generativa sintonizada para español en el enlace:
+
+[https://huggingface.co/hugoramallo/gemma-4-ria-spanish-finetune/tree/main](https://huggingface.co/hugoramallo/gemma-4-ria-spanish-finetune/tree/main)
+
+Archivo .gguf de 5Gb aproximadamente. Debe ser ubicado junto al ejecutable moodocx.exe ó moodocx.run
+
 #### pandoc
 
 ##### Windows

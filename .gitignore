@@ -9,5 +9,5 @@ dist/
 **.gguf
 log_arranque.txt
 docs_gemma
-system_prompt**
+system_prompt-v**
 Temporales/

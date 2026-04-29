@@ -24,7 +24,7 @@ class Moodocx:
     """
     def __init__(self, page: ft.Page, width):
         self.page = page
-        self.page.title = "Moodocx V1.0.7"
+        self.page.title = "Moodocx AI V1.0.0"
         self.title_1 = "Moodocx"
         self.title_2 = "Transforma tus documentos"
         self.page.theme_mode = ft.ThemeMode.LIGHT
