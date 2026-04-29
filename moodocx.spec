@@ -1,4 +1,4 @@
-# -*- mode: python ; coding: utf-8 -*-
+# -- mode: python ; coding: utf-8 --
 
 import os
 import platform
@@ -13,20 +13,20 @@ if sys_os == 'Linux':
     print(">>> Empaquetando para Arch Linux: Usando binarios personalizados .so")
     custom_binaries = [
         # (origen relativo a donde ejecutas pyinstaller, destino dentro del empaquetado)
-        ('/home/johan/_virtualP/lib/python3.14/site-packages/llama_cpp/lib/*.so', 'llama_cpp'),
-        ('/home/johan/_virtualP/lib/python3.14/site-packages/llama_cpp/lib/*.so', 'llama_cpp/lib') # Respaldo para versiones recientes del wrapper
+        (r'/home/johan/_virtualP/lib/python3.14/site-packages/llama_cpp/lib/*.so', 'llama_cpp'),
+        (r'/home/johan/_virtualP/lib/python3.14/site-packages/llama_cpp/lib/*.so', 'llama_cpp/lib') # Respaldo para versiones recientes del wrapper
     ]
 elif sys_os == 'Windows':
     print(">>> Empaquetando para Windows 11: Usando binarios personalizados .dll")
     custom_binaries = [
-        ('C:/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp'),
-        ('C:/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp/lib')
+        (r'C:/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp'),
+        (r'C:/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp/lib')
     ]
 else:
     print(f">>> Sistema operativo no soportado por esta configuración: {sys_os}")
 
 # 3. Ubicar la ruta del paquete de Python puro
-llama_cpp_path = os.path.dirname(llama_cpp.__file__)
+llama_cpp_path = os.path.dirname(llama_cpp._file_)
 
 a = Analysis(
     ['moodocx.py'],
@@ -40,6 +40,9 @@ a = Analysis(
         ('md_handler/expected_output2.md', 'md_handler'),
         ('md_handler/system_prompt.md', 'md_handler'),
         ('pandoc_handler/flatten_tables.lua', 'pandoc_handler'),
+        ('C:\\Windows\\System32\\vulkan-1.dll', '.'), # Pone vulkan en la raíz del exe
+        ('C:\\Windows\\System32\\vcruntime140.dll', '.'),
+        ('C:\\Windows\\System32\\vcruntime140_1.dll', '.'),
     ],
     hiddenimports=['pycparser.lextab', 'pycparser.yacctab', 'pandoc_handler', 'html_css_handler', 'json_handler', 'latex_handler', 'md_handler', 'xml_handler', 'filesystem', 'data_models', 'llama_cpp'],
     hookspath=[],
