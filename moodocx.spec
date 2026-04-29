@@ -19,8 +19,8 @@ if sys_os == 'Linux':
 elif sys_os == 'Windows':
     print(">>> Empaquetando para Windows 11: Usando binarios personalizados .dll")
     custom_binaries = [
-        ('/c/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp'),
-        ('/c/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp/lib')
+        ('C:/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp'),
+        ('C:/_virtualP/Lib/site-packages/llama_cpp/lib/*.dll', 'llama_cpp/lib')
     ]
 else:
     print(f">>> Sistema operativo no soportado por esta configuración: {sys_os}")
