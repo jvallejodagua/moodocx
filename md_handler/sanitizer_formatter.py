@@ -23,7 +23,7 @@ class SanitizerFormatter(FormatterAbstract):
         #¿Cuándo ocurren los otros caracteres vacíos?
         #empty_characters_pattern = r'[\r\x0b\x0c\u200b\ufeff]'
         #Retroceso de carro para limpiar
-        empty_characters_pattern = r'[\r]'
+        empty_characters_pattern = self.windows_r_chars
         empty_characters_regex = re.compile(empty_characters_pattern)
         self.apply_regex(empty_characters_regex, r'')
 
@@ -262,10 +262,6 @@ class SanitizerFormatter(FormatterAbstract):
                 active_numeral = False
                 active_literal = False
                 numeral_chars_count = 0
-
-            # Se comenta el caso de los literales porque el compilador
-            # de pandoc no captura correctamente los textos ubicados fuera
-            # de la línea del literal (bajo los literales)
 
             if not is_numeral and not is_literal and active_numeral:
                 spaced_text = f"{spaced_text}\n{" "*numeral_chars_count}{line}"
