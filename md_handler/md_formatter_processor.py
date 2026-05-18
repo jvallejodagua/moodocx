@@ -47,12 +47,12 @@ class MdFormatterProcessor:
             
             self.sanitizer_formatter = SanitizerFormatter(self.content)
             self.content = self.sanitizer_formatter.sanitize_text()
-            
+            '''
             self.template_formatter = TemplateFormatter(self.content)
             self.content = self.template_formatter.format_multiline_quiz()
-            
             self.sequence_formatter = SequenceFormatter(self.content)
             self.content = self.sequence_formatter.get_formatted_text()
+            '''
             
             output_file = self.outputs_path / file.name
             no_space_stem = self.files_finder.make_no_space_stem(file)

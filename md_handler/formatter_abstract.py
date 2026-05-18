@@ -19,6 +19,9 @@ class FormatterAbstract:
         self.literal_B_character = r'\b[bB]\b'
         self.literal_C_character = r'\b[cC]\b'
         self.literal_D_character = r'\b[dD]\b'
+        self.any_literal = (
+            rf'\b[aAbBcCdD]\b'
+        )
         self.soft_new_line = r'\\\n'
         self.pandoc_comment_raw = r'<!-- -->'
         self.worng_italic_mark = r'\*{3}'
@@ -50,10 +53,6 @@ class FormatterAbstract:
         )
         self.windows_r_chars = r'\r'
         
-        self.any_literal = (
-            rf'(?:\b[aAbBcCdD]\b)'
-            rf'{self.punctuation_separator}'
-        )
 
         # regex compuestos
         self.added_prompt_text = self.get_interine_text(self.literal_A_character)

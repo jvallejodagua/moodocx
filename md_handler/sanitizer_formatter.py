@@ -10,6 +10,7 @@ class SanitizerFormatter(FormatterAbstract):
         super().__init__()
 
         self.sanitized_text = content
+        self.numeral_counter = 0
 
     def apply_regex(self, pattern, replace):
         self.sanitized_text= re.sub(
@@ -69,7 +70,7 @@ class SanitizerFormatter(FormatterAbstract):
     def apply_marks_to_options(self):
         marks_pattern = (
             rf'({self.open_bracket})'
-            rf'({self.any_literal})'
+            rf'({self.any_literal}{self.punctuation_separator})'
             rf'({self.space_but_new_line}{self.multiline_dotall})'
             rf'({self.close_bracket}{self.open_braces}'
             rf'{self.multiline_dotall}{self.closed_braces})'
@@ -93,12 +94,12 @@ class SanitizerFormatter(FormatterAbstract):
 
     def expand_options_marks(self):
         colapsed_pattern = (
-            rf'(^{self.any_literal}'
+            rf'(^{self.any_literal}{self.punctuation_separator}'
             rf'{self.space_but_new_line}'
             rf'{self.open_bracket}{self.raw_chunk_multiline}'
             rf'{self.close_bracket}{self.open_braces}'
             rf'{self.raw_chunk_multiline}{self.closed_braces})'
-            rf'({self.any_literal}'
+            rf'({self.any_literal}{self.punctuation_separator}'
             rf'{self.space_but_new_line})'
         )
         colapsed_regex = re.compile(colapsed_pattern, re.MULTILINE)
@@ -107,11 +108,11 @@ class SanitizerFormatter(FormatterAbstract):
     def expand_options_general(self):
 
         expand_options_pattern = (
-            rf'((?:{self.any_literal}|' #literal or numeral
+            rf'((?:{self.any_literal}{self.punctuation_separator}|' #literal or numeral
             rf'(?:{self.numeral_character}{self.punctuation_separator}))'
             rf'{self.space_but_new_line}'
             rf'{self.raw_chunk_multiline})'
-            rf'({self.any_literal}'
+            rf'({self.any_literal}{self.punctuation_separator}'
             rf'{self.space_but_new_line}'
             rf'{self.raw_chunk_multiline})'
         )
@@ -126,7 +127,7 @@ class SanitizerFormatter(FormatterAbstract):
 
         single_literal_pattern = (
             rf'({self.closed_braces})({self.any_literal}'
-            rf'{self.space_but_new_line}'
+            rf'{self.punctuation_separator}{self.space_but_new_line}'
             rf'{self.one_line_dotall})'
         )
 
@@ -142,16 +143,42 @@ class SanitizerFormatter(FormatterAbstract):
         code_block_regex = re.compile(code_block_pattern)
         self.apply_regex(code_block_regex, r'')
 
+    def fix_options_text(self, content):
+        mark_pattern = (
+            rf'({self.raw_chunk_multiline})?'
+            rf'{self.open_bracket}({self.raw_chunk_multiline})'
+            rf'{self.close_bracket}{self.open_braces}.mark'
+            rf'{self.closed_braces}({self.raw_chunk_multiline})?'
+        )
+
+        mark_regex = re.compile(mark_pattern)
+        return re.sub(mark_regex, r'\1**\2**\3', content)
+
     def fix_literals(self):
 
         compact_literal_pattern = (
-            rf'({self.any_literal})({self.optional_space_but_new_line})'
+            rf'^({self.any_literal})({self.punctuation_separator})'
+            rf'({self.optional_space_but_new_line})'
             rf'({self.one_line_dotall})'
         )
 
-        compact_literal_regex = re.compile(compact_literal_pattern)
+        compact_literal_regex = re.compile(compact_literal_pattern, re.MULTILINE)
 
-        self.apply_regex(compact_literal_regex, r'\1 \3')
+        self.apply_regex(
+            compact_literal_regex,
+            lambda m: f"{m.group(1).upper()}. {self.fix_options_text(m.group(4))}"
+        )
+
+    def fix_numerals(self):
+
+        compact_numeral_pattern = (
+            rf'^({self.numeral_character})({self.punctuation_separator})'
+            rf'({self.optional_space_but_new_line})({self.one_line_dotall})'
+        )
+
+        compact_numeral_regex = re.compile(compact_numeral_pattern, re.MULTILINE)
+
+        self.apply_regex(compact_numeral_regex, r'\1. \4')
 
     def fix_excesive_new_lines(self):
 
@@ -166,7 +193,7 @@ class SanitizerFormatter(FormatterAbstract):
             rf'({self.content_but_space})'
             rf'\n'
             rf'({self.optional_space_but_new_line}'
-            rf'{self.any_literal} {self.one_line_dotall})'
+            rf'{self.any_literal}{self.punctuation_separator} {self.one_line_dotall})'
         )
 
         collapsed_option_regex = re.compile(collapsed_option_pattern)
@@ -175,57 +202,84 @@ class SanitizerFormatter(FormatterAbstract):
             collapsed_option_regex,
             rf'\1{self.md_newline}\2'
             )
+    
+    def get_fixed_numeral_text(self, match: re.Match) -> str:
+        normal_text = match.group(2)
+        self.numeral_counter += 1
 
-    def replace_if_not_interine_numeral(self, match):
-        data = match.groupdict()
-        interine_text = data.get(self.added_prompt_text_key)
-        self.build_pattern_list(self.simple_numeral_pattern)
-        self.build_regex()
-        numeral_regex = re.compile(
-            self.working_regex,
-            re.MULTILINE
+        return f'{self.numeral_counter}{self.output_punctuation}{normal_text}'
+
+    def fix_numerals_sequence(self):
+        numeral_pattern = (
+            rf'^({self.numeral_character}{self.punctuation_separator})'
+            rf'({self.to_end_chunk_multiline})'
+        )
+        numeral_regex = re.compile(numeral_pattern, re.MULTILINE)
+        self.sanitized_text = numeral_regex.sub(
+            self.get_fixed_numeral_text,
+            self.sanitized_text,
         )
 
-        not_replace = numeral_regex.search(interine_text)
-        original_text = match.group(0)
-
-        if not_replace:
-            return original_text
-        
-        target_key = self.numeral_search_key
-        new_value = self.numeral_example
-
-        modified_text = original_text
-
-        if target_key in data and data[target_key] is not None:
-
-            initial_group = match.start(target_key) - match.start(0)
-            end_group = match.end(target_key) - match.start(0)
-
-            modified_text = (
-                original_text[:initial_group] +
-                new_value +
-                original_text[end_group:]
-            )
-        
-        return modified_text
-
-    def fix_wrong_headings_replacing_numerals(self):
-        self.build_pattern_list(self.headings_but_numerals_pattern)
-        self.build_regex()
-        
-        question_regex = re.compile(
-            self.working_regex,
-            flags=re.DOTALL|re.MULTILINE
+    def space_inner_paragraphs(self):
+        spaced_text = ""
+        numeral_pattern = re.compile(
+            rf'^({self.numeral_character}){self.punctuation_separator}'
+            rf'{self.space_but_new_line}{self.one_line_dotall}'
         )
 
-        self.sanitized_text = re.sub(
-            question_regex,
-            self.replace_if_not_interine_numeral,
-            self.sanitized_text
+        literal_pattern = re.compile(
+            rf'^{self.any_literal}{self.punctuation_separator}{self.space_but_new_line}'
+            rf'{self.one_line_dotall}'
         )
+
+        title_pattern = re.compile(
+            rf'^{self.title_mark}{self.one_line_dotall}'
+        )
+
+        active_numeral = False
+        active_literal = False
+        numeral_chars_count = 0
+        literal_chars_count = 0
+        punctuation_plus_space_count = 2
+
+        for line in self.sanitized_text.splitlines():
+
+            is_numeral = re.fullmatch(numeral_pattern, line)
+            is_literal = re.fullmatch(literal_pattern, line)
+            is_title = re.fullmatch(title_pattern, line)
+
+            if is_numeral:
+                active_numeral = True
+                active_literal = False
+                numeral_chars_count = len(is_numeral.group(1))+punctuation_plus_space_count
+
+            if is_literal:
+                active_literal = True
+                active_numeral = False
+                literal_chars_count = numeral_chars_count+1+punctuation_plus_space_count
+            
+            if is_title:
+                active_numeral = False
+                active_literal = False
+                numeral_chars_count = 0
+
+            # Se comenta el caso de los literales porque el compilador
+            # de pandoc no captura correctamente los textos ubicados fuera
+            # de la línea del literal (bajo los literales)
+
+            if not is_numeral and not is_literal and active_numeral:
+                spaced_text = f"{spaced_text}\n{" "*numeral_chars_count}{line}"
+            elif not is_numeral and not is_literal and active_literal:
+                spaced_text = f"{spaced_text}\n{" "*literal_chars_count}{line}"
+            elif is_literal:
+                spaced_text = f"{spaced_text}\n{" "*numeral_chars_count}{line}"
+            else:
+                spaced_text = f"{spaced_text}\n{line}"
+        
+        self.sanitized_text = spaced_text
 
     def sanitize_text(self):
+        self.numeral_counter = 0
         self.clear_empty_characters()
         self.remove_new_line_empty_space()
         self.remove_comments_marks()
@@ -242,9 +296,12 @@ class SanitizerFormatter(FormatterAbstract):
         self.expand_single_literal()
         self.delete_code_blocks()
         self.fix_literals()
+        self.fix_numerals()
         self.fix_excesive_new_lines()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
-        self.fix_wrong_headings_replacing_numerals()
+        self.fix_numerals_sequence()
+        self.space_inner_paragraphs()
+        self.numeral_counter = 0
         return self.sanitized_text
