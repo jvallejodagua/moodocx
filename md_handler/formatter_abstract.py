@@ -43,7 +43,7 @@ class FormatterAbstract:
         
         # No Flags
         self.code_block_pattern = (
-            rf'{self.pandoc_comment_raw}'
+            rf'{self.pandoc_comment_raw}\n'
         )
         self.windows_r_chars = r'\r'
         

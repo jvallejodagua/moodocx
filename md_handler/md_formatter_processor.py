@@ -47,22 +47,10 @@ class MdFormatterProcessor:
             self.content = self.sanitizer_formatter.sanitize_text()
             
             output_file = self.outputs_path / file.name
-            no_space_stem = self.files_finder.make_no_space_stem(file)
-            images_prefix = self.files_finder.images_prefix
-            image_dir_name = f'{images_prefix}-{no_space_stem}'
-            
-            media_input_folder = self.inputs_path / image_dir_name
-            media_output_folder = self.outputs_path / image_dir_name
-
             print(f"Se escribe {output_file}")
             with open(output_file, 'w', encoding='utf-8') as f2:
                 f2.write(self.content)
-            
-            self.files_finder.copy_directory(
-                from_path = media_input_folder,
-                to_path = media_output_folder
-            )
-    
+                
     def add_optative_pandoc_comment(self, content):
         pandoc_comment = self.formatter_abstract.pandoc_comment_raw
         if pandoc_comment in content:

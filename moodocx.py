@@ -14,7 +14,7 @@ from latex_handler.latex_formulas_to_png_converter import LaTeXFormulasToPngConv
 from latex_handler.latex_tables_to_png_converter import LaTeXTablesToPngConverter
 from xml_handler.pydantic_to_moodle_xml_converter import PydanticToMoodleXmlConverter
 from md_handler.md_formatter_processor import MdFormatterProcessor
-from filesystem.files_finder import FilesManager, SimpleLogger
+from filesystem.files_finder import FilesManager, SimpleLogger, FolderCleaner
 
 class Moodocx:
     """
@@ -115,6 +115,7 @@ class Moodocx:
         self.outputs_path.mkdir(exist_ok=True)
         self.files_finder = FilesManager(self.inputs_path, self.outputs_path)
         self.files_finder.create_compile_dir()
+        self.folder_cleaner = FolderCleaner()
         
         self.actualizar_clases()
 
@@ -260,14 +261,7 @@ class Moodocx:
         if self.chk_word.value:
             scripts_para_proceso.append(("Convirtiendo a markdown...", self.procesador_word))
 
-        se_debe_copiar = (
-            self.chk_tablas.value or
-            self.chk_ecuaciones.value or
-            self.chk_markdown.value
-        ) 
-
-        if se_debe_copiar:
-            scripts_para_proceso.append(("Copiando los markdown...", self.files_finder))
+        scripts_para_proceso.append(("Copiando los markdown...", self.files_finder))
 
         if self.chk_formato_markdown.value:
             scripts_para_proceso.append(("Formateando los markdown...", self.formateador_markdown))
@@ -285,6 +279,7 @@ class Moodocx:
         if self.chk_moodle.value:
             scripts_para_proceso.append(("Convirtiendo a xml moodle...", self.generador_moodle))
         
+        scripts_para_proceso.append(("Limpiando folder vacíos...", self.folder_cleaner))
         return scripts_para_proceso
 
     # Función para procesar los markdown

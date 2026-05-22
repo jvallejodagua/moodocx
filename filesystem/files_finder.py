@@ -109,37 +109,46 @@ class FilesManager(FilesAbstract):
         self.outputs_path = outputs_path
         self.suffix_extension = ".md"
 
-    # Copia los archivos md del directorio de entradas a salidas
     def run(self):
-        self.markdown_files = self.get_files()
-        tag_text = f"Copia md: {self.inputs_path.stem} hacia {self.outputs_path.stem}"
-        tag = self.get_process_tag(tag_text)
-        print(tag)
 
-        for file in self.markdown_files:
-            self.content = ""
+        input_folder_path = Path(self.resolve_user_folder_path("_Entradas"))
+        output_folder_path = Path(self.resolve_user_folder_path("_Salidas"))
+        for item in input_folder_path.rglob('*'):
+            ruta_relativa = item.relative_to(input_folder_path)
+            final_path = output_folder_path / ruta_relativa
+            
+            if item.is_dir():
+                final_path.mkdir(parents=True, exist_ok=True)
+            else:
+                final_path.parent.mkdir(parents=True, exist_ok=True)
+                item.copy(final_path, preserve_metadata=True)
 
-            print(f"Se lee {file}")
-            with open(file, 'r', encoding='utf-8') as f:
-                self.content = f.read()
-            
-            output_file = self.outputs_path / file.name
-            no_space_stem = self.make_no_space_stem(file)
-            images_prefix = self.images_prefix
-            image_dir_name = f'{images_prefix}-{no_space_stem}'
-            
-            media_input_folder = self.inputs_path / image_dir_name
-            media_output_folder = self.outputs_path / image_dir_name
+class FolderCleaner(FilesAbstract):
 
-            print(f"Se escribe {output_file}")
-            with open(output_file, 'w', encoding='utf-8') as f2:
-                f2.write(self.content)
-            
-            self.copy_directory(
-                from_path = media_input_folder,
-                to_path = media_output_folder
-            )
-    
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        input_folder_path = Path(self.resolve_user_folder_path("_Entradas"))
+        output_folder_path = Path(self.resolve_user_folder_path("_Salidas"))
+        for current_root, dirs, _ in input_folder_path.walk(top_down=False):
+            for directory in dirs:
+                dir_to_check = current_root / directory
+                try:
+                    dir_to_check.rmdir()
+                    print(f"[+] Directorio podado: {dir_to_check.resolve()}")
+                except OSError:
+                    pass
+
+        for current_root, dirs, _ in output_folder_path.walk(top_down=False):
+            for directory in dirs:
+                dir_to_check = current_root / directory
+                try:
+                    dir_to_check.rmdir()
+                    print(f"[+] Directorio podado: {dir_to_check.resolve()}")
+                except OSError:
+                    pass
+
 class SimpleLogger(FilesAbstract):
     pass
 

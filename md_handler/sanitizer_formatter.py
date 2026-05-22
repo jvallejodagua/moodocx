@@ -136,11 +136,7 @@ class SanitizerFormatter(FormatterAbstract):
         self.apply_regex(single_literal_regex, rf'\1{self.simple_new_line}\2')
 
     def delete_code_blocks(self):
-        code_block_pattern = (
-            rf'{self.code_block_pattern}'
-        )
-
-        code_block_regex = re.compile(code_block_pattern)
+        code_block_regex = re.compile(self.code_block_pattern)
         self.apply_regex(code_block_regex, r'')
 
     def fix_options_text(self, content):
@@ -293,7 +289,7 @@ class SanitizerFormatter(FormatterAbstract):
         self.delete_code_blocks()
         self.fix_literals()
         self.fix_numerals()
-        self.fix_excesive_new_lines()
+        #self.fix_excesive_new_lines()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
