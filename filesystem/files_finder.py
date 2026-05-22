@@ -128,26 +128,21 @@ class FolderCleaner(FilesAbstract):
     def __init__(self):
         super().__init__()
 
+    def delete_empty_folder(self, folder_path: Path):
+        for current_root, dirs, _ in folder_path.walk(top_down=False):
+            for directory in dirs:
+                dir_to_check = current_root / directory
+                try:
+                    dir_to_check.rmdir()
+                    print(f"[+] Directorio podado: {dir_to_check.resolve()}")
+                except OSError:
+                    pass        
+
     def run(self):
         input_folder_path = Path(self.resolve_user_folder_path("_Entradas"))
         output_folder_path = Path(self.resolve_user_folder_path("_Salidas"))
-        for current_root, dirs, _ in input_folder_path.walk(top_down=False):
-            for directory in dirs:
-                dir_to_check = current_root / directory
-                try:
-                    dir_to_check.rmdir()
-                    print(f"[+] Directorio podado: {dir_to_check.resolve()}")
-                except OSError:
-                    pass
-
-        for current_root, dirs, _ in output_folder_path.walk(top_down=False):
-            for directory in dirs:
-                dir_to_check = current_root / directory
-                try:
-                    dir_to_check.rmdir()
-                    print(f"[+] Directorio podado: {dir_to_check.resolve()}")
-                except OSError:
-                    pass
+        self.delete_empty_folder(input_folder_path)
+        self.delete_empty_folder(output_folder_path)
 
 class SimpleLogger(FilesAbstract):
     pass
