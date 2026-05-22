@@ -424,6 +424,8 @@ class MdQuizToDocxConverter:
         md_files = self.files_finder.get_files()
 
         for md_file in md_files:
+            if md_file.stem.endswith("-modificado"):
+                continue
             md_modified_file = md_file.parent / f'{md_file.stem}-modificado.md'
             docx_file = md_file.parent / f'{md_file.stem}.docx'
             docx_modified_file = md_file.parent / f'{md_modified_file.stem}.docx'
