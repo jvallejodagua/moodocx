@@ -27,16 +27,34 @@ La lógica de transformación es la siguiente:
 import os
 import sys
 import subprocess
+from contextlib import contextmanager
+
+if sys.platform == "win32":
+    _original_popen = subprocess.Popen
+
+    class NoWindowPopen(_original_popen):
+        def __init__(self, *args, **kwargs):
+            # Forzamos la bandera para evitar la consola negra
+            flags = kwargs.get('creationflags', 0)
+            kwargs['creationflags'] = flags | subprocess.CREATE_NO_WINDOW
+            
+            # Seguridad adicional para PyInstaller sin consola
+            if 'stdin' not in kwargs:
+                kwargs['stdin'] = subprocess.DEVNULL
+                
+            super().__init__(*args, **kwargs)
+
+    # Reemplazamos la clase en el módulo estándar
+    subprocess.Popen = NoWindowPopen
+
 import panflute as pf
 from typing import List, Optional
-
 from docx import Document
 from docx.shared import Pt
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_COLOR_INDEX
 from filesystem.files_finder import FilesInSubfolder
-
 import re
 from pathlib import Path
 
@@ -375,6 +393,7 @@ class MdQuizToDocxConverter:
                 doc,
                 input_format='panflute',
                 output_format='markdown+mark',
+                standalone=True,
                 extra_args=['--wrap=none']
             )
 
@@ -457,10 +476,6 @@ class MdQuizToDocxConverter:
                     #f"--resource-path=:{self.inputs_path}"]
                     f"--resource-path={self.inputs_path}"]
                 
-                flags_creation = 0
-                if sys.platform == "win32":
-                    flags_creation = subprocess.CREATE_NO_WINDOW
-
                 subprocess.run(
                     command,
                     cwd=str(self.files_finder.files_path.absolute()),
@@ -468,7 +483,7 @@ class MdQuizToDocxConverter:
                     check=True,
                     capture_output=True,
                     text=True,
-                    creationflags=flags_creation,
+                    creationflags = flags_creation,
                     encoding='utf-8'
                 )
                 
