@@ -18,6 +18,15 @@ class SanitizerFormatter(FormatterAbstract):
             replace,
             self.sanitized_text,
         )
+    
+    def apply_regex_until_none(self, pattern, replace):
+        replace_number = 1
+        
+        while replace_number > 0:
+            self.sanitized_text, replace_number = re.subn(
+                pattern,
+                replace,
+                self.sanitized_text)
 
     def clear_empty_characters(self):
         #¿Cuándo ocurren los otros caracteres vacíos?
@@ -176,13 +185,6 @@ class SanitizerFormatter(FormatterAbstract):
 
         self.apply_regex(compact_numeral_regex, r'\1. \4')
 
-    def fix_excesive_new_lines(self):
-
-        new_line_pattern = rf'{self.excesive_new_line}'
-        new_line_regex = re.compile(new_line_pattern)
-        
-        self.apply_regex(new_line_regex, rf'{self.md_newline}')
-    
     def fix_collapsed_options(self):
 
         collapsed_option_pattern = (
@@ -214,6 +216,23 @@ class SanitizerFormatter(FormatterAbstract):
         self.sanitized_text = numeral_regex.sub(
             self.get_fixed_numeral_text,
             self.sanitized_text,
+        )
+
+    def delete_br_code_before_numeral(self):
+        br_code_before_numeral_pattern = (
+            rf'{self.html_new_line}{self.new_line}'
+            rf'({self.numeral_character}{self.punctuation_separator}'
+            rf'{self.one_line_dotall}|\Z)'
+        )
+
+        br_code_before_numeral_regex = re.compile(
+            br_code_before_numeral_pattern,
+            re.DOTALL
+        )
+
+        self.apply_regex_until_none(
+            br_code_before_numeral_regex,
+            rf'\1'
         )
 
     def space_inner_paragraphs(self):
@@ -289,11 +308,11 @@ class SanitizerFormatter(FormatterAbstract):
         self.delete_code_blocks()
         self.fix_literals()
         self.fix_numerals()
-        #self.fix_excesive_new_lines()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
         self.fix_collapsed_options()
         self.fix_numerals_sequence()
+        self.delete_br_code_before_numeral()
         self.space_inner_paragraphs()
         self.numeral_counter = 0
         return self.sanitized_text

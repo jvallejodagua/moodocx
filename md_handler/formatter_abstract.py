@@ -23,7 +23,6 @@ class FormatterAbstract:
             rf'\b[aAbBcCdD]\b'
         )
         self.soft_new_line = r'\\\n'
-        self.pandoc_comment_raw = r'<!-- -->'
         self.comment_mark = r'^>'
         self.escaped_underline = r'\\_'
         self.open_bracket = r'\['
@@ -32,6 +31,11 @@ class FormatterAbstract:
         self.closed_braces = r'\}'
         self.content_but_space = r'[^\s]+'
         self.many_simple_spaces = r'[^\S\n\t\r\f\v]+'
+
+        #html
+        self.pandoc_comment_raw = r'<!-- -->'
+        self.html_new_line = r'<br>'
+
         # Dotall
         self.one_line_dotall = r'[^\n]+'
         self.multiline_dotall = r'.+?'

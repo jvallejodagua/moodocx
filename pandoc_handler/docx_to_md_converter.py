@@ -42,12 +42,23 @@ class DocxToMdConverter:
         media_folder_path = self.files_finder.files_path / media_folder
         media_folder_path.mkdir(exist_ok=True)
 
-    def build_pandoc_command(self, input_file: str, output_file: str, media_folder: str, filter_path: str) -> list[str]:
+    def build_pandoc_command(
+        self,
+        input_file: str,
+        output_file: str,
+        media_folder: str,
+        filter_path1: str,
+        filter_path2: str,
+    ) -> list[str]:
         return[
             "pandoc",
+            '-f',
+            'docx+empty_paragraphs',
             input_file,
             '--lua-filter',
-            filter_path,
+            filter_path1,
+            '--lua-filter',
+            filter_path2,
             '-t',
             # 'gfm',
             # 'markdown-grid_tables-multiline_tables+pipe_tables',
@@ -102,17 +113,25 @@ class DocxToMdConverter:
             
             self.create_media_directory(media_dir_path)
             
-            lua_filter_path = self.files_finder.resolve_internal_path("pandoc_handler/flatten_tables.lua")
+            lua_flatten_tables_path = self.files_finder.resolve_internal_path("pandoc_handler/flatten_tables.lua")
 
             # Buena práctica: Verificar que el archivo realmente existe antes de llamar a Pandoc
-            if not lua_filter_path.exists():
-                raise FileNotFoundError(f"¡Error Crítico! No se encontró el filtro Lua en: {lua_filter_path}")
+            if not lua_flatten_tables_path.exists():
+                raise FileNotFoundError(f"¡Error Crítico! No se encontró el filtro Lua en: {lua_flatten_tables_path}")
+
+            format_new_lines_path = self.files_finder.resolve_internal_path("pandoc_handler/format_new_lines.lua")
+
+            # Buena práctica: Verificar que el archivo realmente existe antes de llamar a Pandoc
+            if not format_new_lines_path.exists():
+                raise FileNotFoundError(f"¡Error Crítico! No se encontró el filtro Lua en: {format_new_lines_path}")
+
 
             command = self.build_pandoc_command(
                 docx_file,
                 md_file,
                 media_dir_path,
-                lua_filter_path)
+                lua_flatten_tables_path,
+                format_new_lines_path)
 
             try:
                 result = self.execute_pandoc_process(command)
