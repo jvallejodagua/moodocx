@@ -63,6 +63,67 @@ class DocxPostProcessor:
     Clase encargada de la limpieza y ajuste fino de archivos DOCX.
     Usa inspección profunda de definiciones de numeración (Deep Inspection).
     """
+    def __init__(self, target_font: Optional[str] = None, target_font_size: Optional[int] = None):
+        self.target_font = target_font
+        self.target_font_size = target_font_size
+
+    def apply_global_font(self, file_path: str):
+        # Si no hay fuente ni tamaño definido, no hacemos nada
+        if not self.target_font and not self.target_font_size:
+            return
+            
+        try:
+            doc = Document(file_path)
+            
+            # 1. Modificar el estilo base 'Normal'
+            style = doc.styles['Normal']
+            if self.target_font:
+                style.font.name = self.target_font
+            if self.target_font_size:
+                style.font.size = Pt(self.target_font_size)
+            
+            # 2. Modificar los valores por defecto a nivel de documento (Deep XML override)
+            for rPr in doc.element.xpath('.//w:rPrDefault/w:rPr'):
+                
+                # A. Ajuste de familia tipográfica
+                if self.target_font:
+                    rFonts = rPr.find(qn('w:rFonts'))
+                    if rFonts is None:
+                        rFonts = OxmlElement('w:rFonts')
+                        rPr.append(rFonts)
+                    
+                    rFonts.set(qn('w:ascii'), self.target_font)
+                    rFonts.set(qn('w:hAnsi'), self.target_font)
+                    rFonts.set(qn('w:cs'), self.target_font)
+                
+                # B. Ajuste de tamaño de fuente
+                if self.target_font_size:
+                    # En OOXML el tamaño se define en medios puntos (ej. 12pt = 24)
+                    half_points = str(int(self.target_font_size * 2))
+                    
+                    # Para texto regular (sz)
+                    sz = rPr.find(qn('w:sz'))
+                    if sz is None:
+                        sz = OxmlElement('w:sz')
+                        rPr.append(sz)
+                    sz.set(qn('w:val'), half_points)
+                    
+                    # Para texto complejo/símbolos (szCs)
+                    szCs = rPr.find(qn('w:szCs'))
+                    if szCs is None:
+                        szCs = OxmlElement('w:szCs')
+                        rPr.append(szCs)
+                    szCs.set(qn('w:val'), half_points)
+                
+            doc.save(file_path)
+            
+            msg = f"    -> Post-procesamiento: Fuente ajustada"
+            if self.target_font: msg += f" a '{self.target_font}'"
+            if self.target_font_size: msg += f" tamaño {self.target_font_size}pt"
+            print(f"{msg} en {file_path}")
+            
+        except Exception as e:
+            print(f"    -> ERROR al ajustar formato global en {file_path}: {e}")
 
     def _is_bullet_list(self, doc, numId_val):
         """
@@ -312,7 +373,9 @@ class MdQuizToDocxConverter:
     def __init__(self,
         inputs_path: Path = Path("Temporales"),
         outputs_path: Path = Path("TemporalesTextoAVoz"),
-        reuse_stimulus_input: bool = False):
+        reuse_stimulus_input: bool = False,
+        target_font: str = "Liberation Serif",
+        target_font_size: int = 18):
         """
         Inicializa el restructurador.
 
@@ -324,6 +387,9 @@ class MdQuizToDocxConverter:
         self.inputs_path = inputs_path
         self.destination_path = outputs_path
         self.reuse_stimulus = reuse_stimulus_input
+        self.target_font = target_font
+        self.target_font_size = target_font_size
+        
         self.files_finder = FilesInSubfolder(
             files_path = self.inputs_path,
             suffix_extension = ".md"
@@ -457,8 +523,10 @@ class MdQuizToDocxConverter:
             
             self.files_finder.file_exists(docx_file)
             
-            # Instanciamos el procesador (puedes hacerlo fuera del loop si prefieres optimizar)
-            docx_cleaner = DocxPostProcessor()
+            docx_cleaner = DocxPostProcessor(
+                target_font=self.target_font,
+                target_font_size=self.target_font_size)
+            docx_cleaner.apply_global_font(str(docx_file))
 
             # Aplicamos la limpieza al archivo docx recién creado
             docx_cleaner.remove_bullets_keep_indent(str(docx_file))
@@ -490,7 +558,8 @@ class MdQuizToDocxConverter:
                 )
                 
                 self.files_finder.file_exists(docx_modified_file)
-
+                docx_cleaner.apply_global_font(str(docx_modified_file))
+                
                 # Aplicamos la limpieza al archivo docx recién creado
                 docx_cleaner.remove_bullets_keep_indent(str(docx_modified_file))
                 #Convertir opciones A. B. C. a lista real

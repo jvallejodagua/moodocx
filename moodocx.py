@@ -83,6 +83,12 @@ class Moodocx:
             label_style = self.estilo_texto,
         )
 
+        self.chk_dummy = ft.Checkbox(
+            label = "Dummy",
+            value = False,
+            label_style = self.estilo_texto,
+        )
+
         # 2. Barra de progreso y texto informativo (ocultos hasta que inicie la ejecución)
         self.progreso = ft.ProgressBar(
             width = self.page_width - 10*self.page.padding,
@@ -239,16 +245,79 @@ class Moodocx:
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
         )
 
+        area_basica=ft.Column(
+            [self.chk_dummy],
+            scroll=ft.ScrollMode.AUTO, spacing=0,
+        )
+
+        area_avanzada=ft.Column(
+            [fila_central],
+            scroll=ft.ScrollMode.AUTO, spacing=0,
+        )
+
+        tab_label_basica= ft.Tab(
+            label="Básico",
+        )
+
+        tab_label_avanzada= ft.Tab(
+            label="Avanzado"
+        )
+
+        ui_tabbar = ft.TabBar(
+            tabs=[
+                tab_label_basica,
+                tab_label_avanzada,
+            ],
+            label_text_style= self.estilo_texto,
+        )
+
+        ui_tabview = ft.TabBarView(
+            expand=True,
+            controls=[
+                ft.Container(content=area_basica),
+                ft.Container(content=area_avanzada),
+            ],
+        )
+
+        ui_column = ft.Column(
+            expand=True,
+            controls=[
+                ui_tabbar,
+                ui_tabview,
+            ],
+        )
+
+        ui_tabs=ft.Tabs(
+            selected_index=0,
+            length=2,
+            expand=True,
+            content=ui_column
+        )
+
+        ui_area= ft.Container(
+            content=ui_tabs,
+            margin=0,
+            padding=2,
+            alignment=ft.Alignment.TOP_LEFT,
+            bgcolor=ft.Colors.WHITE,
+            #width=600,
+            expand=True,
+            #height=400,
+            border_radius=10,
+            border=ft.Border.all(3, ft.Colors.BLACK),
+            ink=True,
+        )
+
         columna_general = ft.Column(
             controls = [
                 columna_titulo,
-                fila_central,
+                ui_area,
                 columna_inferior,
             ],
             spacing = 15,
             alignment = ft.MainAxisAlignment.CENTER,
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-            #expand = True,
+            expand = True,
         )
 
         return columna_general

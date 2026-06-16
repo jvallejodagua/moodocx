@@ -4,7 +4,7 @@
 import base64
 
 # 1 pixel = 9525 emus. Elaboro con menos emus para mejorar el ajuste visual.
-pixel_a_emus = 7925
+pixel_a_emus = 9525
 
 def calculate_pixels_from_emu(emu_value):
     return int(emu_value / pixel_a_emus)
