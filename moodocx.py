@@ -6,6 +6,7 @@ import time
 import threading
 import asyncio
 import sys
+import json
 from pathlib import Path
 import traceback
 from pandoc_handler.docx_to_md_converter import DocxToMdConverter
@@ -24,7 +25,7 @@ class Moodocx:
     """
     def __init__(self, page: ft.Page, width):
         self.page = page
-        self.page.title = "Moodocx V1.1.1"
+        self.page.title = "Moodocx V1.1.2"
         self.title_1 = "Moodocx"
         self.title_2 = "Transforma tus documentos"
         self.page.theme_mode = ft.ThemeMode.LIGHT
@@ -82,11 +83,85 @@ class Moodocx:
             value = False,
             label_style = self.estilo_texto,
         )
-
-        self.chk_dummy = ft.Checkbox(
-            label = "Dummy",
-            value = False,
+        
+        self.fuente_selector = ft.Dropdown(
+            label = "Seleccione la fuente",
             label_style = self.estilo_texto,
+            text_style = self.estilo_texto,
+            expand=True)
+        
+        self.fuente_selector.options = [
+            ft.DropdownOption(
+				text = "Liberation Serif",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "Liberation Sans",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "Liberation Mono",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "Carlito",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "Caladea",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+        ]
+
+        self.fuente_selector.value="Liberation Serif"
+
+        self.altura_letra_selector = ft.Dropdown(
+            label = "Seleccione el tamaño de la fuente",
+            label_style = self.estilo_texto,
+            text_style = self.estilo_texto,
+            expand=True)
+        
+        self.altura_letra_selector.options = [
+            ft.DropdownOption(
+				text = "8",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "10",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "12",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "14",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "16",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "18",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "20",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+            ft.DropdownOption(
+				text = "22",
+				style = ft.ButtonStyle(text_style=self.estilo_texto)),
+        ]
+
+        self.altura_letra_selector.value="18"
+
+        self.selector_proceso = ft.SegmentedButton(
+            on_change=self.handle_selection_change,
+            selected_icon=ft.Icon(ft.Icons.ADD_BOX_SHARP),
+            selected=["formatear_word"],
+            allow_empty_selection=True,
+            allow_multiple_selection=True,
+            style = ft.ButtonStyle(text_style=self.estilo_texto),
+            segments=[
+                ft.Segment(
+                    value="formatear_word",
+                    label=ft.Text("Formatear Word"),
+                ),
+                ft.Segment(
+                    value="producir_moodle",
+                    label=ft.Text("Producir Moodle"),
+                ),
+            ],
         )
 
         # 2. Barra de progreso y texto informativo (ocultos hasta que inicie la ejecución)
@@ -125,6 +200,39 @@ class Moodocx:
         
         self.actualizar_clases()
 
+    def handle_selection_change(self, evento_proceso: ft.Event[ft.SegmentedButton]):
+        # 1. Obtenemos el texto crudo del evento tal y como lo envía Flet
+        datos_crudos = str(evento_proceso.data)
+        
+        # 2. Búsqueda directa de subcadenas (Infalible sin importar si es Set, List o JSON)
+        es_word = "formatear_word" in datos_crudos
+        es_moodle = "producir_moodle" in datos_crudos
+        
+        # 3. Asignamos los valores booleanos al backend de cada componente
+        self.chk_word.value = es_word
+        self.chk_formato_markdown.value = es_word
+        self.chk_ecuaciones.value = es_word
+        self.chk_tablas.value = es_word
+        self.chk_texto_ayuda.value = es_word
+        self.chk_markdown.value = es_word
+        
+        self.chk_moodle.value = es_moodle
+        
+        # 4. Forzamos el renderizado directo de los componentes
+        self.chk_word.update()
+        self.chk_formato_markdown.update()
+        self.chk_ecuaciones.update()
+        self.chk_tablas.update()
+        self.chk_texto_ayuda.update()
+        self.chk_markdown.update()
+        self.chk_moodle.update()
+        
+        evento_proceso.control.update()
+        
+        # Monitor de depuración corregido
+        print(f"Datos crudos recibidos: {datos_crudos}")
+        print(f"Estado real interpretado: Word={es_word}, Moodle={es_moodle}")
+
     def actualizar_clases(self):
         
         self.procesador_word = DocxToMdConverter(
@@ -149,6 +257,8 @@ class Moodocx:
             inputs_path = self.outputs_path,
             outputs_path = self.outputs_path,
             reuse_stimulus_input = self.chk_reutilizar_estimulo.value,
+            target_font = self.fuente_selector.value,
+            target_font_size = int(self.altura_letra_selector.value),
         )
 
         self.generador_moodle = PydanticToMoodleXmlConverter(
@@ -189,7 +299,6 @@ class Moodocx:
             ),
             self.chk_formato_markdown,
             self.chk_texto_ayuda,
-            self.chk_reutilizar_estimulo,
         ]
 
         columna_opciones_adicionales = ft.Column(
@@ -245,9 +354,16 @@ class Moodocx:
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
         )
 
+        area_segura = ft.SafeArea(self.selector_proceso)
+
         area_basica=ft.Column(
-            [self.chk_dummy],
-            scroll=ft.ScrollMode.AUTO, spacing=0,
+            [self.fuente_selector,
+            self.altura_letra_selector,
+            self.chk_reutilizar_estimulo,
+            area_segura],
+            scroll=ft.ScrollMode.AUTO,
+            spacing=20,
+            margin=10,
         )
 
         area_avanzada=ft.Column(
@@ -413,7 +529,7 @@ def main(page: ft.Page):
     page_width = 900
     app = Moodocx(page, page_width)
     page.window.width = page_width
-    page.window.height = page_width*0.7
+    page.window.height = page_width*0.75
     
     page.add(app.obtener_vista())
 
