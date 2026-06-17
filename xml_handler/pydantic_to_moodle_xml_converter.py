@@ -25,10 +25,11 @@ class PydanticToMoodleXmlConverter:
     en formato Moodle Quiz.
     """
 
-    def __init__(self, inputs_path: Path, outputs_path: Path):
+    def __init__(self, inputs_path: Path, outputs_path: Path, font_size: int):
         self.inputs_path = inputs_path
         self.outputs_path = outputs_path
         self.files_finder = SimpleLogger()
+        self.font_size = font_size
 
     def _pretty_print_xml(self, root_element: ET.Element) -> str:
         """
@@ -159,7 +160,7 @@ class PydanticToMoodleXmlConverter:
         print(tag)
 
         print("--- Parseando documentos DOCX a modelos Pydantic ---")
-        parser = DocxToPydantic()
+        parser = DocxToPydantic(self.font_size)
         document_models = parser.parse_all(self.inputs_path)
 
         if not document_models:

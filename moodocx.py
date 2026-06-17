@@ -250,7 +250,8 @@ class Moodocx:
         )
         
         self.procesador_ecuaciones = LaTeXFormulasToPngConverter(
-            inputs_path = self.outputs_path
+            inputs_path = self.outputs_path,
+            font_size = int(self.altura_letra_selector.value),
         )
         
         self.generador_word = MdQuizToDocxConverter(
@@ -263,7 +264,8 @@ class Moodocx:
 
         self.generador_moodle = PydanticToMoodleXmlConverter(
             inputs_path = self.outputs_path,
-            outputs_path = self.outputs_path)
+            outputs_path = self.outputs_path,
+            font_size = int(self.altura_letra_selector.value))
 
     def obtener_vista(self):
         """
@@ -529,7 +531,7 @@ def main(page: ft.Page):
     page_width = 900
     app = Moodocx(page, page_width)
     page.window.width = page_width
-    page.window.height = page_width*0.75
+    page.window.height = page_width*0.8
     
     page.add(app.obtener_vista())
 

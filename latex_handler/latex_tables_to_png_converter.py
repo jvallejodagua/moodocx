@@ -198,7 +198,7 @@ class TableCompiler:
             pdf_converter = PdfDocument(pdf_file)
             page_counter = len(pdf_converter)
             pdf_dpi = 72
-            objective_dpi = 300
+            objective_dpi = 72
             resolution_scale_factor = objective_dpi/pdf_dpi
             base_name = "temp"
 

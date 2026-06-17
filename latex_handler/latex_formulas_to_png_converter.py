@@ -23,7 +23,7 @@ class LaTeXFormulasToPngConverter:
     y pypdfium2, reemplazando el texto original por referencias a las imágenes.
     """
 
-    def __init__(self, inputs_path: Path):
+    def __init__(self, inputs_path: Path, font_size: int):
         """
         Inicializa el procesador de ecuaciones.
 
@@ -37,7 +37,8 @@ class LaTeXFormulasToPngConverter:
             suffix_extension = ".md"
         )
         self.images_prefix = self.files_finder.images_prefix
-        
+        self.font_size = font_size
+
         # Configurar rutas de binarios según el sistema operativo
         if platform.system() == 'Windows':
             self.pdflatex_path = resolve_pdflatex_path()
@@ -66,7 +67,8 @@ class LaTeXFormulasToPngConverter:
             r"\usepackage{siunitx}",
             r"\usepackage{xcolor}",
             r"\pagecolor{white}",
-            r"\begin{document}",            r"\normalsize",
+            r"\begin{document}",
+            rf"\fontsize{{{self.font_size}}}{{{int(self.font_size*1.2)}}}\selectfont",
             f"{delimiter}{latex_code}{delimiter}",
             r"\end{document}"
         ]
