@@ -18,12 +18,20 @@ from filesystem.path_latex_windows import resolve_pdflatex_path
 
 class TableCompiler:
         # 1. Al instanciar la clase, le pasas tus argumentos extra
-    def __init__(self, inputs_path, no_space_stem_name, delete_hint_flag):
+    def __init__(self,
+        inputs_path,
+        no_space_stem_name,
+        delete_hint_flag,
+        font_size: int,
+        max_img_size: float):
+
         self.files_finder = FilesChecker(inputs_path)
         self.no_space_stem_name = no_space_stem_name
         self.inputs_path=inputs_path
         self.contador_tablas = 1  # Llevamos la cuenta de cuántas tablas van
         self.delete_hint_flag=delete_hint_flag
+        self.font_size = font_size
+        self.max_img_size = max_img_size
 
     def parse_markdown_table_to_latex(self, md_table_str):
         """Traduce una tabla Markdown a código LaTeX standalone usando tabularx."""
@@ -108,9 +116,8 @@ class TableCompiler:
             r"\usepackage{tabularx}",
             r"\usepackage{amsmath}",
             r"\begin{document}",
-            r"{\Huge",
-            # Iniciamos tabularx forzando el ancho objetivo de 30cm
-            r"\begin{tabularx}{30cm}{" + col_format + "}",
+            rf"\fontsize{{{self.font_size}}}{{{int(self.font_size*1.2)}}}\selectfont",
+            rf"\begin{{tabularx}}{{{self.max_img_size}cm}}{{{col_format}}}"
             "\t" + r"\hline"
         ]
         
@@ -126,7 +133,7 @@ class TableCompiler:
             latex_code.append("\t" + " & ".join(cells) + r" \\ \hline")
             
         latex_code.append(r"\end{tabularx}")
-        latex_code.append("}")
+        #latex_code.append("}")
         latex_code.append(r"\end{document}")
         
         return "\n".join(latex_code)
@@ -198,7 +205,7 @@ class TableCompiler:
             pdf_converter = PdfDocument(pdf_file)
             page_counter = len(pdf_converter)
             pdf_dpi = 72
-            objective_dpi = 72
+            objective_dpi = 130
             resolution_scale_factor = objective_dpi/pdf_dpi
             base_name = "temp"
 
@@ -249,12 +256,14 @@ class TableCompiler:
 
 class LaTeXTablesToPngConverter:
 
-    def __init__(self, inputs_path, delete_hint_flag):
+    def __init__(self, inputs_path, delete_hint_flag, font_size: int, max_img_size: float):
         self.delete_hint_flag=delete_hint_flag
         self.files_finder = FilesInSubfolder(
             files_path = inputs_path,
             suffix_extension = ".md"
         )
+        self.font_size = font_size
+        self.max_img_size = max_img_size
 
     def set_delete_hint_flag(self, nuevo_estado):
         self.delete_hint_flag=nuevo_estado
@@ -287,7 +296,9 @@ class LaTeXTablesToPngConverter:
             table_compiler = TableCompiler(
                 inputs_path = inputs_path,
                 no_space_stem_name = no_space_stem_name,
-                delete_hint_flag = self.delete_hint_flag)
+                delete_hint_flag = self.delete_hint_flag,
+                font_size = self.font_size,
+                max_img_size = self.max_img_size)
 
             nuevo_contenido = re.sub(table_pattern, table_compiler, content)
 

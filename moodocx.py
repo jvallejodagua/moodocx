@@ -259,6 +259,8 @@ class Moodocx:
         self.procesador_tablas = LaTeXTablesToPngConverter(
             inputs_path = self.outputs_path,
             delete_hint_flag = self.chk_texto_ayuda.value,
+            font_size = int(self.altura_letra_selector.value),
+            max_img_size = float(self.max_ancho_imagen.value),
         )
         
         self.procesador_ecuaciones = LaTeXFormulasToPngConverter(
