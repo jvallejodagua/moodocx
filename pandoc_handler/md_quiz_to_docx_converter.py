@@ -50,7 +50,7 @@ if sys.platform == "win32":
 import panflute as pf
 from typing import List, Optional
 from docx import Document
-from docx.shared import Pt
+from docx.shared import Pt, Cm
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_COLOR_INDEX
@@ -363,6 +363,28 @@ class DocxPostProcessor:
         if modified:
             doc.save(file_path)
 
+    def apply_margins(self, file_path: str, margin_cm: float = 1.0):
+        """
+        Ajusta los márgenes superior, inferior, izquierdo y derecho de todas
+        las secciones del documento a la medida especificada en centímetros.
+        """
+        try:
+            doc = Document(file_path)
+            modified = False
+            
+            for section in doc.sections:
+                section.top_margin = Cm(margin_cm)
+                section.bottom_margin = Cm(margin_cm)
+                section.left_margin = Cm(margin_cm)
+                section.right_margin = Cm(margin_cm)
+                modified = True
+                
+            if modified:
+                doc.save(file_path)
+                print(f"    -> Post-procesamiento: Márgenes ajustados a {margin_cm}cm en {file_path}")
+                
+        except Exception as e:
+            print(f"    -> ERROR al ajustar márgenes en {file_path}: {e}")
 
 class MdQuizToDocxConverter:
     """
@@ -528,6 +550,8 @@ class MdQuizToDocxConverter:
                 target_font_size=self.target_font_size)
             docx_cleaner.apply_global_font(str(docx_file))
 
+            docx_cleaner.apply_margins(str(docx_file), margin_cm=1.0)
+
             # Aplicamos la limpieza al archivo docx recién creado
             docx_cleaner.remove_bullets_keep_indent(str(docx_file))
             #Convertir opciones A. B. C. a lista real
@@ -560,6 +584,8 @@ class MdQuizToDocxConverter:
                 self.files_finder.file_exists(docx_modified_file)
                 docx_cleaner.apply_global_font(str(docx_modified_file))
                 
+                docx_cleaner.apply_margins(str(docx_modified_file), margin_cm=1.0)
+
                 # Aplicamos la limpieza al archivo docx recién creado
                 docx_cleaner.remove_bullets_keep_indent(str(docx_modified_file))
                 #Convertir opciones A. B. C. a lista real
