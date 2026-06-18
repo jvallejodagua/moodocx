@@ -230,8 +230,8 @@ class Moodocx:
         evento_proceso.control.update()
         
         # Monitor de depuración corregido
-        print(f"Datos crudos recibidos: {datos_crudos}")
-        print(f"Estado real interpretado: Word={es_word}, Moodle={es_moodle}")
+        # print(f"Datos crudos recibidos: {datos_crudos}")
+        # print(f"Estado real interpretado: Word={es_word}, Moodle={es_moodle}")
 
     def actualizar_clases(self):
         
@@ -265,7 +265,6 @@ class Moodocx:
         self.generador_moodle = PydanticToMoodleXmlConverter(
             inputs_path = self.outputs_path,
             outputs_path = self.outputs_path,
-            font_type = self.fuente_selector.value,
             font_size = int(self.altura_letra_selector.value))
 
     def obtener_vista(self):

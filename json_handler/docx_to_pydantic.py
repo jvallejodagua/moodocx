@@ -65,13 +65,13 @@ class DocxToPydantic:
         'r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
     }
 
-    def __init__(self, font_type: str, font_size: int):
+    def __init__(self, font_size: int):
         ### REFAC: Inicializar diccionarios para almacenar las definiciones de numeración.
         # Esto se llenará una vez por documento.
         self.numbering_definitions: Dict[str, Dict[str, Dict[str, str]]] = {}
         self.num_to_abstract_map: Dict[str, str] = {}
         
-        self.font_config = f"<div style='font-size: {font_size}pt; font-family: \'{font_type}\', sans-serif;'>"
+        self.font_config = f"<div style='font-size: {font_size}pt;'>"
 
     def parse_all(self, folder_path: Path) -> List[DocumentModel]:
         """
