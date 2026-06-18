@@ -65,12 +65,13 @@ class DocxToPydantic:
         'r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
     }
 
-    def __init__(self, font_size: int):
+    def __init__(self, font_type: str, font_size: int):
         ### REFAC: Inicializar diccionarios para almacenar las definiciones de numeración.
         # Esto se llenará una vez por documento.
         self.numbering_definitions: Dict[str, Dict[str, Dict[str, str]]] = {}
         self.num_to_abstract_map: Dict[str, str] = {}
-        self.font_size = font_size
+        
+        self.font_config = f"<div style='font-size: {font_size}pt; font-family: \'{font_type}\', sans-serif;'>"
 
     def parse_all(self, folder_path: Path) -> List[DocumentModel]:
         """
@@ -220,7 +221,7 @@ class DocxToPydantic:
                         if val == 'subscript': text = f"<sub>{text}</sub>"
                         elif val == 'superscript': text = f"<sup>{text}</sup>"
                 html_parts.append(text)
-        return f"<div style='font-size: {self.font_size}pt;'>{''.join(html_parts)}</div>"
+        return f"{self.font_config}{''.join(html_parts)}</div>"
 
     def _is_paragraph_highlighted(self, p_element: etree._Element) -> bool:
         # (Sin cambios en este método)
@@ -246,7 +247,7 @@ class DocxToPydantic:
                     doc_model.questions.append(current_question)
                 
                 question_counter += 1
-                prompt_final_html = f"<div style='font-size: {self.font_size}pt;'><prompt>{html}</prompt></div>"
+                prompt_final_html = f"{self.font_config}<prompt>{html}</prompt></div>"
                 current_question = QuestionModel(
                     identifier=str(question_counter), # El número real secuencial
                     prompt_html=prompt_final_html
@@ -256,7 +257,7 @@ class DocxToPydantic:
                 if current_question:
                     # El identificador se basa en el conteo de opciones para esta pregunta
                     option_identifier = chr(65 + len(current_question.options)) # A, B, C...
-                    content_final_html = f'<div style="font-size: {self.font_size}pt;"><simpleChoice identifier="{option_identifier}">{html}</simpleChoice></div>'
+                    content_final_html = f"{self.font_config}<simpleChoice identifier='{option_identifier}'>{html}</simpleChoice></div>"
                     option = OptionModel(
                         identifier=option_identifier,
                         content_html=content_final_html,
@@ -270,13 +271,13 @@ class DocxToPydantic:
                         last_option = current_question.options[-1]
                         inner_html = last_option.content_html.split('>', 2)[2].rsplit('<', 2)[0]
                         new_inner_html = inner_html + html
-                        last_option.content_html = f'<div style="font-size: {self.font_size}pt;"><simpleChoice identifier="{last_option.identifier}">{new_inner_html}</simpleChoice></div>'
+                        last_option.content_html = f"{self.font_config}<simpleChoice identifier='{last_option.identifier}'>{new_inner_html}</simpleChoice></div>"
                         if is_correct:
                             last_option.is_correct = True
                     else:
                         inner_html = current_question.prompt_html.split('>', 2)[2].rsplit('<', 2)[0]
                         new_inner_html = inner_html + html
-                        current_question.prompt_html = f"<div style='font-size: {self.font_size}pt;'><prompt>{new_inner_html}</prompt></div>"
+                        current_question.prompt_html = f"{self.font_config}<prompt>{new_inner_html}</prompt></div>"
 
         if current_question:
             doc_model.questions.append(current_question)

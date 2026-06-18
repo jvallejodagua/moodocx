@@ -265,6 +265,7 @@ class Moodocx:
         self.generador_moodle = PydanticToMoodleXmlConverter(
             inputs_path = self.outputs_path,
             outputs_path = self.outputs_path,
+            font_type = self.fuente_selector.value,
             font_size = int(self.altura_letra_selector.value))
 
     def obtener_vista(self):

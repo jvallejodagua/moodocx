@@ -231,9 +231,9 @@ class TableCompiler:
                 
                 # 5. Sustituir en el texto Markdown
                 if self.delete_hint_flag:
-                    md_image_ref = f"![]({img_dir_name}/{img_filename})"
+                    md_image_ref = f"![]({img_dir_name}/{img_filename}){{width=1800px}}"
                 else:
-                    md_image_ref = f"![Tabla {self.contador_tablas}]({img_dir_name}/{img_filename})"
+                    md_image_ref = f"![Tabla {self.contador_tablas}]({img_dir_name}/{img_filename}){{width=1800px}}"
             else:
                 print(f"  Error: No se pudo generar la imagen para la tabla {self.contador_tablas}.")
         else:
