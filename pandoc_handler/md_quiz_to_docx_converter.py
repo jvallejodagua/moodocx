@@ -488,7 +488,8 @@ class MdQuizToDocxConverter:
         outputs_path: Path = Path("TemporalesTextoAVoz"),
         reuse_stimulus_input: bool = False,
         target_font: str = "Liberation Serif",
-        target_font_size: int = 18):
+        target_font_size: int = 18,
+        max_img_size: float = 17.5):
         """
         Inicializa el restructurador.
 
@@ -502,6 +503,7 @@ class MdQuizToDocxConverter:
         self.reuse_stimulus = reuse_stimulus_input
         self.target_font = target_font
         self.target_font_size = target_font_size
+        self.max_img_size = max_img_size
         
         self.files_finder = FilesInSubfolder(
             files_path = self.inputs_path,
@@ -642,7 +644,7 @@ class MdQuizToDocxConverter:
             docx_cleaner.apply_global_font(str(docx_file))
 
             docx_cleaner.apply_margins(str(docx_file), margin_cm=1.0)
-            docx_cleaner.restore_original_image_sizes(str(docx_file), max_width_cm=19.0)
+            docx_cleaner.restore_original_image_sizes(str(docx_file), max_width_cm=self.max_img_size)
             # Aplicamos la limpieza al archivo docx recién creado
             docx_cleaner.remove_bullets_keep_indent(str(docx_file))
             #Convertir opciones A. B. C. a lista real

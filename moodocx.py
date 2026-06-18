@@ -78,6 +78,18 @@ class Moodocx:
             label_style = self.estilo_texto,
         )
 
+        self.max_ancho_imagen = ft.TextField(
+            label="Máximo ancho de las imagenes [cm]", 
+            multiline=True, 
+            min_lines=1, 
+            max_lines=8,
+            expand=False,
+            text_style=self.estilo_texto,
+            border_radius=10,
+            label_style=self.estilo_texto,
+            value="17.5",
+        )
+
         self.chk_reutilizar_estimulo = ft.Checkbox(
             label = "Generar reutlización de estímulo",
             value = False,
@@ -260,6 +272,7 @@ class Moodocx:
             reuse_stimulus_input = self.chk_reutilizar_estimulo.value,
             target_font = self.fuente_selector.value,
             target_font_size = int(self.altura_letra_selector.value),
+            max_img_size = float(self.max_ancho_imagen.value),
         )
 
         self.generador_moodle = PydanticToMoodleXmlConverter(
@@ -292,6 +305,11 @@ class Moodocx:
         columna_operaciones_archivos = ft.Column(
             controls = lista_ui_operaciones_archivos,
         )
+        
+        contenedor_max_ancho_imagen = ft.Container(
+            content = self.max_ancho_imagen,
+            padding = 10,
+        )
 
         lista_ui_opciones_adicionales = [
             ft.Text(
@@ -301,6 +319,7 @@ class Moodocx:
             ),
             self.chk_formato_markdown,
             self.chk_texto_ayuda,
+            contenedor_max_ancho_imagen,
         ]
 
         columna_opciones_adicionales = ft.Column(
