@@ -386,6 +386,97 @@ class DocxPostProcessor:
         except Exception as e:
             print(f"    -> ERROR al ajustar márgenes en {file_path}: {e}")
 
+    def restore_original_image_sizes(self, file_path: str, max_width_cm: float = 19.0):
+        """
+        Restaura el tamaño de las imágenes mediante inspección profunda del XML (OpenXML).
+        Captura tanto <wp:inline> como <wp:anchor>, evadiendo los bloqueos de Pandoc y 
+        encontrando las imágenes sin importar si están dentro de listas.
+        """
+        try:
+            doc = Document(file_path)
+            modified = False
+            # 1 cm equivale a 360,000 EMUs (English Metric Units) en OpenXML
+            max_width_emu = int(max_width_cm * 360000) 
+            
+            # Buscar TODOS los elementos de dibujo en el XML, estén donde estén
+            for drawing in doc.element.xpath('.//w:drawing'):
+                
+                # 1. Identificar el contenedor principal (puede ser inline o anchor)
+                container = drawing.find(qn('wp:inline'))
+                if container is None:
+                    container = drawing.find(qn('wp:anchor'))
+                if container is None:
+                    continue
+                    
+                # Extraer nodo de extensión principal
+                wp_extent = container.find(qn('wp:extent'))
+                if wp_extent is None:
+                    continue
+                    
+                # 2. Buscar la referencia a la imagen física usando XPath (etiqueta a:blip)
+                blips = drawing.xpath('.//a:blip')
+                if not blips:
+                    continue
+                embed_id = blips[0].get(qn('r:embed'))
+                if not embed_id:
+                    continue
+                    
+                # 3. Extraer el archivo de imagen binario real del paquete DOCX
+                try:
+                    image_part = doc.part.related_parts[embed_id]
+                    image_obj = image_part.image
+                    
+                    # Extraer píxeles y DPI nativos
+                    px_width = image_obj.px_width
+                    px_height = image_obj.px_height
+                    
+                    # Usar 96 DPI por defecto si la imagen no tiene meta-datos de densidad
+                    dpi = getattr(image_obj, 'horz_dpi', 96)
+                    if not dpi:
+                        dpi = 96
+                        
+                    # Calcular el tamaño original en EMUs (1 pulgada = 914400 EMUs)
+                    orig_width = int((px_width / dpi) * 914400)
+                    orig_height = int((px_height / dpi) * 914400)
+                    
+                except Exception as e:
+                    print(f"      -> Advertencia: No se pudo procesar la imagen {embed_id}: {e}")
+                    continue
+                    
+                # 4. Calcular el tamaño físico preservando el margen de la página (ej. 19cm)
+                if orig_width > max_width_emu:
+                    ratio = max_width_emu / float(orig_width)
+                    final_width = max_width_emu
+                    final_height = int(orig_height * ratio)
+                else:
+                    final_width = orig_width
+                    final_height = orig_height
+                    
+                # 5. Aplicar cambios forzados al XML
+                current_width = int(wp_extent.get('cx', 0))
+                if current_width != final_width:
+                    # Sobrescribir contenedor principal
+                    wp_extent.set('cx', str(final_width))
+                    wp_extent.set('cy', str(final_height))
+                    
+                    # Es CRÍTICO sobrescribir también las etiquetas internas <a:ext> 
+                    # para que Word no distorsione el aspecto de la imagen
+                    a_exts = drawing.xpath('.//a:ext')
+                    for ext in a_exts:
+                        ext.set('cx', str(final_width))
+                        ext.set('cy', str(final_height))
+                        
+                    modified = True
+
+            if modified:
+                doc.save(file_path)
+                print(f"    -> Post-procesamiento: Imágenes XML restauradas con éxito en {file_path}")
+            else:
+                print(f"    -> Post-procesamiento: Las imágenes ya tenían su formato original en {file_path}")
+                
+        except Exception as e:
+            print(f"    -> ERROR al restaurar imágenes por XML en {file_path}: {e}")
+
 class MdQuizToDocxConverter:
     """
     Clase que encapsula la lógica para reestructurar archivos Markdown
@@ -551,7 +642,7 @@ class MdQuizToDocxConverter:
             docx_cleaner.apply_global_font(str(docx_file))
 
             docx_cleaner.apply_margins(str(docx_file), margin_cm=1.0)
-
+            docx_cleaner.restore_original_image_sizes(str(docx_file), max_width_cm=19.0)
             # Aplicamos la limpieza al archivo docx recién creado
             docx_cleaner.remove_bullets_keep_indent(str(docx_file))
             #Convertir opciones A. B. C. a lista real
@@ -585,7 +676,7 @@ class MdQuizToDocxConverter:
                 docx_cleaner.apply_global_font(str(docx_modified_file))
                 
                 docx_cleaner.apply_margins(str(docx_modified_file), margin_cm=1.0)
-
+                docx_cleaner.restore_original_image_sizes(str(docx_modified_file), max_width_cm=19.0)
                 # Aplicamos la limpieza al archivo docx recién creado
                 docx_cleaner.remove_bullets_keep_indent(str(docx_modified_file))
                 #Convertir opciones A. B. C. a lista real
