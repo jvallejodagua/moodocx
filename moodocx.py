@@ -25,7 +25,7 @@ class Moodocx:
     """
     def __init__(self, page: ft.Page, width):
         self.page = page
-        self.page.title = "Moodocx V1.1.2"
+        self.page.title = "Moodocx V1.1.4"
         self.title_1 = "Moodocx"
         self.title_2 = "Transforma tus documentos"
         self.page.theme_mode = ft.ThemeMode.LIGHT
@@ -79,7 +79,7 @@ class Moodocx:
         )
 
         self.max_ancho_imagen = ft.TextField(
-            label="Máximo ancho de las imagenes [cm]", 
+            label="Máximo ancho de las imágenes [cm]", 
             multiline=True, 
             min_lines=1, 
             max_lines=8,
