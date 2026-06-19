@@ -5,7 +5,7 @@ a = Analysis(
     ['moodocx.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('pandoc_handler/flatten_tables.lua', 'pandoc_handler')],
+    datas=[('pandoc_handler/flatten_tables.lua', 'pandoc_handler/format_new_lines.lua', 'pandoc_handler')],
     hiddenimports=['pycparser.lextab', 'pycparser.yacctab', 'pandoc_handler', 'html_css_handler', 'json_handler', 'latex_handler', 'md_handler', 'xml_handler', 'filesystem', 'data_models'],
     hookspath=[],
     hooksconfig={},
