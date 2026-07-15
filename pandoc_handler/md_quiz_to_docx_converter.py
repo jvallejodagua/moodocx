@@ -138,7 +138,10 @@ class DocxPostProcessor:
 
             # 1. Buscar el elemento <w:num> que coincida con el numId del párrafo
             # Esto nos dará el abstractNumId
-            num_element = numbering_part._element.find(f'.//w:num[@w:numId="{numId_val}"]', numbering_part._element.nsmap)
+            num_element = numbering_part._element.find(
+                f'.//w:num[@w:numId="{numId_val}"]',
+                numbering_part._element.nsmap
+            )
             if num_element is None:
                 return False
 
@@ -149,12 +152,18 @@ class DocxPostProcessor:
             abstract_num_val = abstract_num_id_element.get(qn('w:val'))
 
             # 2. Buscar la definición abstracta <w:abstractNum> usando el ID encontrado
-            abstract_num = numbering_part._element.find(f'.//w:abstractNum[@w:abstractNumId="{abstract_num_val}"]', numbering_part._element.nsmap)
+            abstract_num = numbering_part._element.find(
+                f'.//w:abstractNum[@w:abstractNumId="{abstract_num_val}"]',
+                numbering_part._element.nsmap
+            )
             if abstract_num is None:
                 return False
 
             # 3. Buscar el nivel 0 (<w:lvl w:ilvl="0">) para ver cómo está formateado
-            lvl = abstract_num.find(f'.//w:lvl[@w:ilvl="0"]', numbering_part._element.nsmap)
+            lvl = abstract_num.find(
+                f'.//w:lvl[@w:ilvl="0"]',
+                numbering_part._element.nsmap
+            )
             if lvl is None:
                 return False
 
@@ -229,7 +238,10 @@ class DocxPostProcessor:
                 return
 
             # 1. Encontrar el elemento num (<w:num>) usando el numId actual
-            num_element = numbering_part._element.find(f'.//w:num[@w:numId="{num_id}"]', numbering_part._element.nsmap)
+            num_element = numbering_part._element.find(
+                f'.//w:num[@w:numId="{num_id}"]',
+                numbering_part._element.nsmap
+            )
             if num_element is None:
                 return
             
@@ -240,12 +252,18 @@ class DocxPostProcessor:
             abstract_num_val = abstract_num_id_element.get(qn('w:val'))
 
             # 2. Encontrar la definición abstracta (<w:abstractNum>)
-            abstract_num = numbering_part._element.find(f'.//w:abstractNum[@w:abstractNumId="{abstract_num_val}"]', numbering_part._element.nsmap)
+            abstract_num = numbering_part._element.find(
+                f'.//w:abstractNum[@w:abstractNumId="{abstract_num_val}"]',
+                numbering_part._element.nsmap
+            )
             if abstract_num is None:
                 return
 
             # 3. Modificar la Definición Abstracta (Afecta a todas las listas de este tipo)
-            lvl = abstract_num.find(f'.//w:lvl[@w:ilvl="{level}"]', numbering_part._element.nsmap)
+            lvl = abstract_num.find(
+                f'.//w:lvl[@w:ilvl="{level}"]',
+                numbering_part._element.nsmap
+            )
             if lvl is not None:
                 # A. Forzar formato de letra (A., B., C.)
                 num_fmt = lvl.find(qn('w:numFmt'))
@@ -260,7 +278,10 @@ class DocxPostProcessor:
             # 4. Modificar la Instancia Específica (Override) - CORRECCIÓN CLAVE
             # A veces la lista específica tiene una anulación (override) que fuerza el inicio en 4.
             # Debemos buscar <w:lvlOverride w:ilvl="1"> y cambiar <w:startOverride w:val="1">
-            lvl_override = num_element.find(f'.//w:lvlOverride[@w:ilvl="{level}"]', numbering_part._element.nsmap)
+            lvl_override = num_element.find(
+                f'.//w:lvlOverride[@w:ilvl="{level}"]',
+                numbering_part._element.nsmap
+            )
             if lvl_override is not None:
                 start_override = lvl_override.find(qn('w:startOverride'))
                 if start_override is not None:
@@ -532,7 +553,13 @@ class MdQuizToDocxConverter:
                 for each_list_item in elem._content:
                     for each_item in each_list_item._content:
                         each_item_content.append(each_item)
-                    each_list_item_content.append(pf.ListItem(prefix_para,*cloned_context,*each_item_content))
+                    each_list_item_content.append(
+                        pf.ListItem(
+                            prefix_para,
+                            *cloned_context,
+                            *each_item_content
+                        )
+                    )
                     each_item_content=[]
 
                 #new_content.append(pf.Para())
@@ -644,7 +671,10 @@ class MdQuizToDocxConverter:
             docx_cleaner.apply_global_font(str(docx_file))
 
             docx_cleaner.apply_margins(str(docx_file), margin_cm=1.0)
-            docx_cleaner.restore_original_image_sizes(str(docx_file), max_width_cm=self.max_img_size)
+            docx_cleaner.restore_original_image_sizes(
+                str(docx_file),
+                max_width_cm=self.max_img_size
+            )
             # Aplicamos la limpieza al archivo docx recién creado
             docx_cleaner.remove_bullets_keep_indent(str(docx_file))
             #Convertir opciones A. B. C. a lista real
@@ -677,8 +707,14 @@ class MdQuizToDocxConverter:
                 self.files_finder.file_exists(docx_modified_file)
                 docx_cleaner.apply_global_font(str(docx_modified_file))
                 
-                docx_cleaner.apply_margins(str(docx_modified_file), margin_cm=1.0)
-                docx_cleaner.restore_original_image_sizes(str(docx_modified_file), max_width_cm=19.0)
+                docx_cleaner.apply_margins(
+                    str(docx_modified_file),
+                    margin_cm=1.0
+                )
+                docx_cleaner.restore_original_image_sizes(
+                    str(docx_modified_file),
+                    max_width_cm=19.0
+                )
                 # Aplicamos la limpieza al archivo docx recién creado
                 docx_cleaner.remove_bullets_keep_indent(str(docx_modified_file))
                 #Convertir opciones A. B. C. a lista real
