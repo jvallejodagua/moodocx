@@ -25,7 +25,7 @@ class Moodocx:
     """
     def __init__(self, page: ft.Page, width):
         self.page = page
-        self.page.title = "Moodocx V1.1.4"
+        self.page.title = "Moodocx V1.1.5"
         self.title_1 = "Moodocx"
         self.title_2 = "Transforma tus documentos"
         self.page.theme_mode = ft.ThemeMode.LIGHT
@@ -206,8 +206,8 @@ class Moodocx:
         self.inputs_path.mkdir(exist_ok=True)
         self.outputs_path = self.files_checker.resolve_user_folder_path("_Salidas")
         self.outputs_path.mkdir(exist_ok=True)
-        self.files_finder = FilesManager(self.inputs_path, self.outputs_path)
-        self.files_finder.create_compile_dir()
+        self.files_manager = FilesManager(self.inputs_path, self.outputs_path)
+        self.files_manager.create_compile_dir()
         self.folder_cleaner = FolderCleaner()
         
         self.actualizar_clases()
@@ -469,7 +469,7 @@ class Moodocx:
         if self.chk_word.value:
             scripts_para_proceso.append(("Convirtiendo a markdown...", self.procesador_word))
 
-        scripts_para_proceso.append(("Copiando los markdown...", self.files_finder))
+        scripts_para_proceso.append(("Copiando los markdown...", self.files_manager))
 
         if self.chk_formato_markdown.value:
             scripts_para_proceso.append(("Formateando los markdown...", self.formateador_markdown))

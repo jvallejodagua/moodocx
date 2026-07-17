@@ -110,9 +110,9 @@ class FilesManager(FilesAbstract):
         self.suffix_extension = ".md"
 
     def run(self):
-
         input_folder_path = Path(self.resolve_user_folder_path("_Entradas"))
         output_folder_path = Path(self.resolve_user_folder_path("_Salidas"))
+        
         for item in input_folder_path.rglob('*'):
             ruta_relativa = item.relative_to(input_folder_path)
             final_path = output_folder_path / ruta_relativa
@@ -120,7 +120,19 @@ class FilesManager(FilesAbstract):
             if item.is_dir():
                 final_path.mkdir(parents=True, exist_ok=True)
             else:
+                # Asegurar que la estructura de directorios exista antes de procesar el archivo
                 final_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Regla de negocio: Sincronización basada en st_mtime
+                if final_path.exists():
+                    mtime_origen = item.stat().st_mtime
+                    mtime_destino = final_path.stat().st_mtime
+                    
+                    # Cortocircuito: Si el archivo destino es idéntico en fecha o más reciente, saltamos la copia
+                    if mtime_destino >= mtime_origen:
+                        continue
+                
+                # Ejecutamos la copia nativa desde el objeto Path preservando los metadatos (mtime)
                 item.copy(final_path, preserve_metadata=True)
 
 class FolderCleaner(FilesAbstract):
