@@ -78,6 +78,12 @@ class Moodocx:
             label_style = self.estilo_texto,
         )
 
+        self.chk_es_opcion_colapsada = ft.Checkbox(
+            label = "Trabajar opciones colapsadas",
+            value = False,
+            label_style = self.estilo_texto,
+        )
+
         self.max_ancho_imagen = ft.TextField(
             label="Máximo ancho de las imágenes [cm]", 
             multiline=True, 
@@ -254,6 +260,7 @@ class Moodocx:
         self.formateador_markdown = MdFormatterProcessor(
             inputs_path = self.inputs_path,
             outputs_path = self.outputs_path,
+            is_collapsed_content = self.chk_es_opcion_colapsada.value,
         )
 
         self.procesador_tablas = LaTeXTablesToPngConverter(
@@ -321,6 +328,7 @@ class Moodocx:
             ),
             self.chk_formato_markdown,
             self.chk_texto_ayuda,
+            self.chk_es_opcion_colapsada,
             contenedor_max_ancho_imagen,
         ]
 

@@ -6,11 +6,12 @@ from md_handler.formatter_abstract import FormatterAbstract
 
 class SanitizerFormatter(FormatterAbstract):
 
-    def __init__(self, content):
+    def __init__(self, content, is_collapsed_content):
         super().__init__()
 
         self.sanitized_text = content
         self.numeral_counter = 0
+        self.is_collapsed_content = is_collapsed_content
 
     def apply_regex(self, pattern, replace):
         self.sanitized_text= re.sub(
@@ -298,13 +299,14 @@ class SanitizerFormatter(FormatterAbstract):
         self.remove_escaped_underline()
         self.apply_marks_to_options()
         self.refactorize_marks()
-        self.expand_options_marks()
-        self.expand_options_general()
-        self.expand_options_general()
-        self.expand_options_general()
-        self.expand_single_literal()
-        self.expand_single_literal()
-        self.expand_single_literal()
+        if self.is_collapsed_content:
+            self.expand_options_marks()
+            self.expand_options_general()
+            self.expand_options_general()
+            self.expand_options_general()
+            self.expand_single_literal()
+            self.expand_single_literal()
+            self.expand_single_literal()
         self.delete_code_blocks()
         self.fix_literals()
         self.fix_numerals()

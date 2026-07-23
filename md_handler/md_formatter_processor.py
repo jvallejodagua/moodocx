@@ -10,7 +10,7 @@ from filesystem.files_finder import FilesInSubfolder
 
 class MdFormatterProcessor:
     
-    def __init__(self, inputs_path: Path, outputs_path: Path):
+    def __init__(self, inputs_path: Path, outputs_path: Path, is_collapsed_content):
         self.formatter_abstract = FormatterAbstract()
         self.sanitizer_formatter = None
         self.template_formatter = None
@@ -22,6 +22,7 @@ class MdFormatterProcessor:
         self.inputs_path = inputs_path
         self.outputs_path = outputs_path
         self.content = ""
+        self.is_collapsed_content = is_collapsed_content
         
     def run(self):
         input_name = self.inputs_path.stem
@@ -43,7 +44,7 @@ class MdFormatterProcessor:
             #new_content = self.template_formatter.get_formatted_markdown_text()
             self.content = self.add_optative_pandoc_comment(self.content)
             
-            self.sanitizer_formatter = SanitizerFormatter(self.content)
+            self.sanitizer_formatter = SanitizerFormatter(self.content, self.is_collapsed_content)
             self.content = self.sanitizer_formatter.sanitize_text()
             
             output_file = self.outputs_path / file.name
