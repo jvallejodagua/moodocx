@@ -52,12 +52,11 @@ class LaTeXFormulasToPngConverter:
 
     def _create_latex_document(self, latex_code: str, delimiter: str) -> str:
         """
-        Crea el documento LaTeX standalone para renderizar la ecuación de manera aislada.
-        Maneja tanto ecuaciones en línea ($) como en bloque ($$).
+        Crea el documento LaTeX standalone ajustado para un recorte exacto 
+        y con forzado de tamaño \displaystyle en todas las fracciones.
         """
-        # Se utiliza varwidth para ajustar el ancho automáticamente sin desbordar
         latex_template = [
-            r"\documentclass[border=2pt]{standalone}",
+            r"\documentclass[border=2pt, varwidth=\maxdimen]{standalone}",
             r"\usepackage[utf8]{inputenc}",
             r"\usepackage[version=4]{mhchem}",
             r"\usepackage{amsmath}",
@@ -67,9 +66,20 @@ class LaTeXFormulasToPngConverter:
             r"\usepackage{siunitx}",
             r"\usepackage{xcolor}",
             r"\pagecolor{white}",
+            # 1. Anulación global del espaciado vertical de los bloques
+            r"\AtBeginDocument{",
+            r"  \setlength{\abovedisplayskip}{0pt}",
+            r"  \setlength{\belowdisplayskip}{0pt}",
+            r"  \setlength{\abovedisplayshortskip}{0pt}",
+            r"  \setlength{\belowdisplayshortskip}{0pt}",
+            r"}",
+            # 2. Sobrescritura de \frac para forzar \displaystyle en todo nivel de anidamiento
+            r"\let\oldfrac\frac",
+            r"\renewcommand{\frac}[2]{\oldfrac{\displaystyle #1}{\displaystyle #2}}",
             r"\begin{document}",
             rf"\fontsize{{{self.font_size}}}{{{int(self.font_size*1.2)}}}\selectfont",
-            f"{delimiter}{latex_code}{delimiter}",
+            # Se inyecta \displaystyle inicial para ecuaciones en línea ($)
+            f"{delimiter}{r'\displaystyle ' if delimiter == '$' else ''}{latex_code}{delimiter}",
             r"\end{document}"
         ]
         return "\n".join(latex_template)
@@ -176,8 +186,7 @@ class LaTeXFormulasToPngConverter:
         def replacement_func(match):
             #Se cambia el delimitador porque standalone no soporta los dobles
             delimiter = match.group(1)
-            if delimiter=="$$":
-                delimiter="$"
+
             latex_code = match.group(2).strip()
             
             if not latex_code:
