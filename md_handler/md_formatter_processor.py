@@ -4,14 +4,14 @@
 import re
 import time
 from pathlib import Path
-from md_handler.formatter_abstract import FormatterAbstract
+from md_handler.formatter_recipes import FormatterRecipes
 from md_handler.sanitizer_formatter import SanitizerFormatter
 from filesystem.files_finder import FilesInSubfolder
 
 class MdFormatterProcessor:
     
     def __init__(self, inputs_path: Path, outputs_path: Path, is_collapsed_content):
-        self.formatter_abstract = FormatterAbstract()
+        self.formatter_recipes = FormatterRecipes()
         self.sanitizer_formatter = None
         self.template_formatter = None
         self.sequence_formatter = None
@@ -53,7 +53,7 @@ class MdFormatterProcessor:
                 f2.write(self.content)
                 
     def add_optative_pandoc_comment(self, content):
-        pandoc_comment = self.formatter_abstract.pandoc_comment_raw
+        pandoc_comment = self.formatter_recipes.pandoc_comment_raw
         if pandoc_comment in content:
             return f'{content}\n{pandoc_comment}\n'
         else:
