@@ -206,7 +206,7 @@ class SanitizerFormatter():
         normal_text = match.group(2)
         self.numeral_counter += 1
 
-        return f'{self.numeral_counter}{self.output_punctuation}{normal_text}'
+        return f'{self.numeral_counter}{self.recipes.output_punctuation}{normal_text}'
 
     def fix_numerals_sequence(self):
         numeral_pattern = (
