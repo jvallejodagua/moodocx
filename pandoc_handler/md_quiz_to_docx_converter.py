@@ -235,6 +235,9 @@ class MdQuizToDocxConverter:
             #Convertir opciones A. B. C. a lista real
             docx_cleaner.convert_text_options_to_list(str(docx_file))
 
+            # Se aplica los aumentos de tamaño de letra a los títulos.
+            docx_cleaner.adjust_heading_sizes(str(docx_file))
+
             if self.reuse_stimulus:
 
                 self._process_file(str(md_file),str(md_modified_file))
@@ -274,6 +277,9 @@ class MdQuizToDocxConverter:
                 docx_cleaner.remove_bullets_keep_indent(str(docx_modified_file))
                 #Convertir opciones A. B. C. a lista real
                 docx_cleaner.convert_text_options_to_list(str(docx_modified_file))
+
+                # Se aplica los aumentos de tamaño de letra a los títulos.
+                docx_cleaner.adjust_heading_sizes(str(docx_file))
         
         if not markdown_files_found:
             print("No se encontraron archivos .md en la carpeta.")

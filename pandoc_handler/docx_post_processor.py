@@ -445,3 +445,51 @@ class DocxPostProcessor:
                 
         except Exception as e:
             print(f"    -> ERROR al restaurar imágenes por XML en {file_path}: {e}")
+
+    def adjust_heading_sizes(self, file_path: str):
+        """
+        Ajusta el tamaño de fuente de los estilos de título (Heading 1 al 6)
+        sumando el incremento correspondiente al tamaño base (target_font_size).
+        """
+        # Si no hay tamaño base definido, no podemos calcular los incrementos proporcionales
+        if not self.target_font_size:
+            return
+            
+        try:
+            doc = Document(file_path)
+            
+            # Mapeo de niveles de título con sus respectivos incrementos en puntos (pt)
+            increments = {
+                1: 10,
+                2: 8,
+                3: 6,
+                4: 4,
+                5: 2,
+                6: 0
+            }
+            
+            modified = False
+            
+            for level, increment in increments.items():
+                style_name = f'Heading {level}'
+                
+                # Modificar el estilo solo si existe en el documento generado
+                if style_name in doc.styles:
+                    style = doc.styles[style_name]
+                    
+                    # Calcular el nuevo tamaño en base al parámetro de entrada
+                    new_size_pt = self.target_font_size + increment
+                    style.font.size = Pt(new_size_pt)
+                    
+                    # Asegurar que el título use la misma familia tipográfica (opcional pero recomendado)
+                    if self.target_font:
+                        style.font.name = self.target_font
+                        
+                    modified = True
+            
+            if modified:
+                doc.save(file_path)
+                print(f"    -> Post-procesamiento: Tamaños de títulos configurados en {file_path}")
+                
+        except Exception as e:
+            print(f"    -> ERROR al ajustar los tamaños de los títulos en {file_path}: {e}")
